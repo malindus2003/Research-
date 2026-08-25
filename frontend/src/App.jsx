@@ -210,11 +210,6 @@ export default function App() {
                   zones={zones}
                   onTelemetrySent={fetchAllData}
                 />
-                <StorageZoneTelemetry
-                  zones={zones}
-                  selectedZoneId={selectedZoneId}
-                  onSelectZone={setSelectedZoneId}
-                />
               </div>
             )}
 
