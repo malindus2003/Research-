@@ -547,42 +547,125 @@ export default function VisionInspector({ onInspectionComplete }) {
         </div>
       </div>
 
-      {/* Interactive Dummy Simulation Slider for Level Tuning */}
-      <div className="bg-slate-900/90 p-4 rounded-xl border border-purple-500/30 glow-amber">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Sliders className="h-4 w-4 text-purple-400" />
-            <span className="text-xs font-bold text-white">Ripeness & Spoilage Level Simulation Slider:</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-purple-300">
-              Spoilage Level: <strong className="text-white text-sm">{dummyLevel}%</strong>
-            </span>
-            {isManualOverride && (
-              <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                Live Simulator Active
-              </span>
-            )}
-          </div>
-        </div>
+      {/* Interactive Dummy Simulation Slider with Dynamic Color Level */}
+      {(() => {
+        const getLevelColor = (val) => {
+          if (val < 25) return { text: "text-emerald-400", bg: "bg-emerald-500", border: "border-emerald-500/50", glow: "shadow-emerald-500/30", label: "LOW RISK (UNRIPE / FIRM)", colorHex: "#10b981" };
+          if (val < 55) return { text: "text-green-400", bg: "bg-green-500", border: "border-green-500/50", glow: "shadow-green-500/30", label: "LOW RISK (OPTIMAL RIPE)", colorHex: "#22c55e" };
+          if (val < 78) return { text: "text-amber-400", bg: "bg-amber-500", border: "border-amber-500/50", glow: "shadow-amber-500/30", label: "HIGH RISK (OVERRIPE / WILTED)", colorHex: "#f59e0b" };
+          return { text: "text-rose-400", bg: "bg-rose-500", border: "border-rose-500/50", glow: "shadow-rose-500/30", label: "CRITICAL RISK (SPOILED / MOULD)", colorHex: "#ef4444" };
+        };
+        const levelTheme = getLevelColor(dummyLevel);
 
-        <div className="mt-3">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={dummyLevel}
-            onChange={(e) => handleDummySliderChange(e.target.value)}
-            className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
-          />
-          <div className="flex justify-between text-[10px] text-slate-400 mt-1.5 font-medium">
-            <span className="text-emerald-400">🟢 0% Unripe (Firm)</span>
-            <span className="text-emerald-300">✨ 35% Optimal Ripe</span>
-            <span className="text-amber-400">⚠️ 70% Overripe (Soft)</span>
-            <span className="text-rose-400">🚨 100% Spoiled (Mould)</span>
+        return (
+          <div className={`p-4 rounded-xl bg-slate-900/90 border transition-all duration-300 ${levelTheme.border} shadow-lg ${levelTheme.glow}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Sliders className={`h-4 w-4 ${levelTheme.text}`} />
+                <span className="text-xs font-bold text-white">Ripeness & Spoilage Level Simulation Slider:</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-black border flex items-center gap-1.5 shadow-md ${
+                  dummyLevel >= 78 ? 'bg-rose-500/20 text-rose-300 border-rose-500 animate-pulse' :
+                  dummyLevel >= 55 ? 'bg-amber-500/20 text-amber-300 border-amber-500' :
+                  'bg-emerald-500/20 text-emerald-300 border-emerald-500'
+                }`}>
+                  <span className={`h-2 w-2 rounded-full ${levelTheme.bg}`} />
+                  {dummyLevel}% Level — {levelTheme.label}
+                </span>
+                {isManualOverride && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-medium">
+                    Simulator Active
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Custom Multi-Color Gradient Slider Track */}
+            <div className="mt-4 relative">
+              <div className="h-3 w-full rounded-full overflow-hidden bg-slate-950 border border-slate-800 relative">
+                {/* 4-Color Full Gradient Background */}
+                <div
+                  className="absolute inset-0 h-full w-full opacity-35"
+                  style={{
+                    background: "linear-gradient(to right, #10b981 0%, #22c55e 35%, #f59e0b 70%, #ef4444 100%)"
+                  }}
+                />
+                {/* Active Colored Fill Bar */}
+                <div
+                  className="h-full rounded-full transition-all duration-150 shadow-md"
+                  style={{
+                    width: `${dummyLevel}%`,
+                    backgroundColor: levelTheme.colorHex,
+                    boxShadow: `0 0 12px ${levelTheme.colorHex}`
+                  }}
+                />
+              </div>
+
+              {/* Range input layered cleanly over track */}
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={dummyLevel}
+                onChange={(e) => handleDummySliderChange(e.target.value)}
+                className="w-full h-3 absolute top-0 left-0 opacity-0 cursor-pointer"
+              />
+            </div>
+
+            {/* Interactive Milestone Clicker Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-2 border-t border-slate-800/80">
+              <button
+                type="button"
+                onClick={() => handleDummySliderChange(10)}
+                className={`py-1.5 px-2 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                  dummyLevel < 25
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500 shadow-sm'
+                    : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                <span>🟢</span> 0% - 25% Unripe (Firm)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleDummySliderChange(40)}
+                className={`py-1.5 px-2 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                  dummyLevel >= 25 && dummyLevel < 55
+                    ? 'bg-green-500/20 text-green-300 border-green-500 shadow-sm'
+                    : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                <span>✨</span> 35% - 50% Optimal Ripe
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleDummySliderChange(72)}
+                className={`py-1.5 px-2 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                  dummyLevel >= 55 && dummyLevel < 78
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500 shadow-sm'
+                    : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                <span>⚠️</span> 70% - 75% Overripe (Soft)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleDummySliderChange(94)}
+                className={`py-1.5 px-2 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                  dummyLevel >= 78
+                    ? 'bg-rose-500/20 text-rose-300 border-rose-500 shadow-sm animate-pulse'
+                    : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                <span>🚨</span> 90% - 100% Spoiled (Mould)
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Main Inspection Grid */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
