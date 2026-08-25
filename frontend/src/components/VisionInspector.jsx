@@ -1,15 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Upload, Eye, CheckCircle2, AlertTriangle, Sparkles, Video, VideoOff, Sliders, XCircle, Layers, ArrowRight, ShieldAlert } from 'lucide-react';
+import { Camera, Upload, Eye, CheckCircle2, AlertTriangle, Sparkles, Video, VideoOff, Sliders, XCircle, Layers, ArrowRight, ShieldAlert, Apple, Carrot, Milk, Fish, Beef } from 'lucide-react';
 import axios from 'axios';
 
-// High-resolution realistic photography presets covering all categories
+// Comprehensive high-resolution photographic presets across ALL 5 food categories
 const SAMPLE_PRESETS = [
+  // 1. Fruits
   {
     id: "strawberries_mould",
     name: "Mouldy Strawberries",
     category: "Fruits",
     icon: "🍓",
-    container: "Container #C-104 (Berry Crisper)",
+    container: "Container #C-104 (Fruit Chamber)",
     imageUrl: "https://images.unsplash.com/photo-1543158181-e6f9f6712055?w=600&auto=format&fit=crop&q=80",
     ripeness_stage: "Spoiled / Senescent (Rotting)",
     ripeness_percent: 98,
@@ -73,6 +74,8 @@ const SAMPLE_PRESETS = [
       { label: "PRIME CRISP TURGOR", type: "fresh", x: 20, y: 15, width: 60, height: 70, color: "#10b981" }
     ]
   },
+
+  // 2. Vegetables
   {
     id: "spinach_wilted",
     name: "Wilted Yellowing Spinach",
@@ -140,6 +143,8 @@ const SAMPLE_PRESETS = [
       { label: "SOFTENING TISSUE", type: "overripe", x: 28, y: 25, width: 48, height: 50, color: "#f59e0b" }
     ]
   },
+
+  // 3. Dairy
   {
     id: "cheese_mouldy",
     name: "Mouldy Aged Cheese",
@@ -164,6 +169,28 @@ const SAMPLE_PRESETS = [
     ]
   },
   {
+    id: "milk_fresh",
+    name: "Fresh Whole Milk",
+    category: "Dairy",
+    icon: "🥛",
+    container: "Container #C-301 (Dairy Fridge)",
+    imageUrl: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop&q=80",
+    ripeness_stage: "Optimal Fresh",
+    ripeness_percent: 25,
+    visual_spoilage_score: 6,
+    risk_level: "Low",
+    discoloration_score: 1,
+    mould_detected: false,
+    mould_coverage: 0.0,
+    texture_degradation: 2,
+    detected_defects: [],
+    bounding_boxes: [
+      { label: "STABLE LACTIC HOMOGENEITY", type: "fresh", x: 20, y: 20, width: 60, height: 60, color: "#10b981" }
+    ]
+  },
+
+  // 4. Fish & Seafood
+  {
     id: "salmon_fresh",
     name: "Fresh Atlantic Salmon",
     category: "Fish",
@@ -183,6 +210,8 @@ const SAMPLE_PRESETS = [
       { label: "OPTIMAL ASTAXANTHIN TRANSLUCENCY", type: "fresh", x: 22, y: 20, width: 56, height: 60, color: "#10b981" }
     ]
   },
+
+  // 5. Meat & Poultry
   {
     id: "beef_fresh",
     name: "Fresh Beef Sirloin",
@@ -229,7 +258,7 @@ const SAMPLE_PRESETS = [
 ];
 
 export default function VisionInspector({ onInspectionComplete }) {
-  const [category, setCategory] = useState("Fruits");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
   const [selectedPresetId, setSelectedPresetId] = useState(SAMPLE_PRESETS[0].id);
   const [previewImage, setPreviewImage] = useState(SAMPLE_PRESETS[0].imageUrl);
   const [currentContainerName, setCurrentContainerName] = useState(SAMPLE_PRESETS[0].container);
@@ -247,7 +276,6 @@ export default function VisionInspector({ onInspectionComplete }) {
   const streamRef = useRef(null);
 
   useEffect(() => {
-    // Notify parent on initial load
     if (onInspectionComplete) {
       onInspectionComplete(SAMPLE_PRESETS[0]);
     }
@@ -256,10 +284,13 @@ export default function VisionInspector({ onInspectionComplete }) {
     };
   }, []);
 
+  const filteredPresets = selectedCategoryFilter === "all"
+    ? SAMPLE_PRESETS
+    : SAMPLE_PRESETS.filter(p => p.category.toLowerCase() === selectedCategoryFilter.toLowerCase());
+
   const handleSelectPreset = (preset) => {
     stopCamera();
     setSelectedPresetId(preset.id);
-    setCategory(preset.category);
     setCurrentContainerName(preset.container);
     setPreviewImage(preset.imageUrl);
     setCvResult(preset);
@@ -268,6 +299,14 @@ export default function VisionInspector({ onInspectionComplete }) {
 
     if (onInspectionComplete) {
       onInspectionComplete(preset);
+    }
+  };
+
+  const handleCategoryFilterClick = (cat) => {
+    setSelectedCategoryFilter(cat);
+    const matches = cat === "all" ? SAMPLE_PRESETS : SAMPLE_PRESETS.filter(p => p.category.toLowerCase() === cat.toLowerCase());
+    if (matches.length > 0) {
+      handleSelectPreset(matches[0]);
     }
   };
 
@@ -281,7 +320,7 @@ export default function VisionInspector({ onInspectionComplete }) {
       reader.onload = async (event) => {
         const dataUrl = event.target.result;
         setPreviewImage(dataUrl);
-        await runBackendAnalysis(dataUrl, category);
+        await runBackendAnalysis(dataUrl, cvResult?.category || "Fruits");
       };
       reader.readAsDataURL(file);
     }
@@ -324,7 +363,7 @@ export default function VisionInspector({ onInspectionComplete }) {
     const dataUrl = canvas.toDataURL("image/jpeg");
     stopCamera();
     setPreviewImage(dataUrl);
-    runBackendAnalysis(dataUrl, category);
+    runBackendAnalysis(dataUrl, cvResult?.category || "Fruits");
   };
 
   const runBackendAnalysis = async (imageDataUrl, targetCategory) => {
@@ -348,7 +387,6 @@ export default function VisionInspector({ onInspectionComplete }) {
     }
   };
 
-  // Handle Dummy Level Slider Movement (Real-Time Interactive Simulation)
   const handleDummySliderChange = (newVal) => {
     const val = Number(newVal);
     setDummyLevel(val);
@@ -386,7 +424,6 @@ export default function VisionInspector({ onInspectionComplete }) {
 
     const updated = {
       ...cvResult,
-      category: category,
       ripeness_stage: stage,
       ripeness_percent: val,
       visual_spoilage_score: val,
@@ -419,17 +456,12 @@ export default function VisionInspector({ onInspectionComplete }) {
   return (
     <div className="glass-panel p-6 rounded-2xl space-y-5">
       
-      {/* Header */}
+      {/* Top Bar with Clean Category Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white">Container Camera Optical Scanner & Ripeness Assessor</h2>
-            <span className="text-xs px-2.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">
-              Real Photographic AI Inspection
-            </span>
-          </div>
+          <h2 className="text-lg font-bold text-white">Container Camera Optical Scanner & Ripeness Assessor</h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Real photographic inspection of container produce & dynamic level simulation slider
+            Photographic inspection across Fruits, Vegetables, Dairy, Fish & Meat with dynamic level simulation
           </p>
         </div>
 
@@ -450,35 +482,41 @@ export default function VisionInspector({ onInspectionComplete }) {
               <Video className="h-4 w-4" /> Open Container Camera
             </button>
           )}
+        </div>
+      </div>
 
-          <select
-            value={category}
-            onChange={(e) => {
-              const newCat = e.target.value;
-              setCategory(newCat);
-              const match = SAMPLE_PRESETS.find(p => p.category === newCat);
-              if (match) handleSelectPreset(match);
-            }}
-            className="bg-slate-800 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-purple-500"
-          >
-            <option value="Fruits">🍎 Fruits</option>
-            <option value="Vegetables">🥬 Vegetables</option>
-            <option value="Dairy">🥛 Dairy</option>
-            <option value="Fish">🐟 Fish</option>
-            <option value="Meat">🥩 Meat</option>
-          </select>
+      {/* 5-Category Filter Tabs Strip */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <span className="text-xs font-semibold text-slate-400">Filter By Food Category:</span>
+        <div className="flex items-center gap-1.5 overflow-x-auto">
+          {[
+            { id: "all", label: "All Categories", icon: null },
+            { id: "fruits", label: "Fruits", icon: <Apple className="h-3.5 w-3.5 text-amber-400" /> },
+            { id: "vegetables", label: "Vegetables", icon: <Carrot className="h-3.5 w-3.5 text-emerald-400" /> },
+            { id: "dairy", label: "Dairy", icon: <Milk className="h-3.5 w-3.5 text-sky-400" /> },
+            { id: "fish", label: "Fish & Seafood", icon: <Fish className="h-3.5 w-3.5 text-cyan-400" /> },
+            { id: "meat", label: "Meat & Poultry", icon: <Beef className="h-3.5 w-3.5 text-rose-400" /> },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => handleCategoryFilterClick(cat.id)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+                selectedCategoryFilter === cat.id
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              {cat.icon}
+              <span>{cat.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Real Photo Presets Strip */}
       <div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-400">Real Photographic Container Samples:</span>
-          <span className="text-[11px] text-purple-400 font-medium">Click any photo below to inspect</span>
-        </div>
-        
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-2">
-          {SAMPLE_PRESETS.map((preset) => (
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-1">
+          {filteredPresets.map((preset) => (
             <div
               key={preset.id}
               onClick={() => handleSelectPreset(preset)}
@@ -514,7 +552,7 @@ export default function VisionInspector({ onInspectionComplete }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Sliders className="h-4 w-4 text-purple-400" />
-            <span className="text-xs font-bold text-white">Interactive Ripeness & Spoilage Simulator (Dummy Level Slider):</span>
+            <span className="text-xs font-bold text-white">Ripeness & Spoilage Level Simulation Slider:</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-purple-300">
@@ -522,7 +560,7 @@ export default function VisionInspector({ onInspectionComplete }) {
             </span>
             {isManualOverride && (
               <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                Manual Override Active
+                Live Simulator Active
               </span>
             )}
           </div>
@@ -557,7 +595,7 @@ export default function VisionInspector({ onInspectionComplete }) {
               <Camera className="h-3.5 w-3.5 text-purple-400" /> {currentContainerName}
             </span>
             <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
-              Container Optical Sensor
+              Optical Sensor
             </span>
           </div>
 
@@ -634,7 +672,7 @@ export default function VisionInspector({ onInspectionComplete }) {
                   onClick={() => fileInputRef.current.click()}
                   className="text-xs text-slate-400 hover:text-purple-400 flex items-center gap-1 transition-colors"
                 >
-                  <Upload className="h-3.5 w-3.5" /> Upload any food photo
+                  <Upload className="h-3.5 w-3.5" /> Upload any photo
                 </button>
                 <button
                   onClick={startCamera}

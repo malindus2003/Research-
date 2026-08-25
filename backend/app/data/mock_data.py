@@ -61,7 +61,7 @@ STORAGE_ZONES = [
     },
     {
         "id": "zone-fish",
-        "name": "Zone 5: Seafood Ice preservation Bed",
+        "name": "Zone 5: Seafood Ice Preservation Bed",
         "category": "Fish",
         "target_temp": 0.5,
         "current_temp": 1.1,
@@ -76,6 +76,7 @@ STORAGE_ZONES = [
 ]
 
 INITIAL_INVENTORY: List[Dict[str, Any]] = [
+    # 1. Fruits
     {
         "id": "inv-001",
         "name": "Cavendish Ripe Bananas (Crate)",
@@ -118,6 +119,28 @@ INITIAL_INVENTORY: List[Dict[str, Any]] = [
     },
     {
         "id": "inv-003",
+        "name": "Granny Smith Green Apples",
+        "category": "Fruits",
+        "storage_zone": "Zone 1: Fruit & Berry Preservation Chamber",
+        "batch_number": "BAT-2026-AP05",
+        "quantity": "30.0 kg",
+        "stored_at": (datetime.now() - timedelta(hours=24)).strftime("%Y-%m-%d %H:%M"),
+        "storage_duration_hours": 24.0,
+        "current_temp": 8.1,
+        "current_humidity": 87.0,
+        "current_nh3": 0.02,
+        "current_co2": 820.0,
+        "current_voc": 0.18,
+        "spoilage_prob": 8.0,
+        "remaining_shelf_life_hours": 104.0,
+        "risk_level": "Low",
+        "status": "Fresh",
+        "recommendation": "Firm texture & crisp acidity. Ideal for fresh salads and apple pies."
+    },
+
+    # 2. Vegetables
+    {
+        "id": "inv-004",
         "name": "Hydroponic Romaine Lettuce",
         "category": "Vegetables",
         "storage_zone": "Zone 2: Leafy Greens & Vegetable Crisper Vault",
@@ -137,7 +160,7 @@ INITIAL_INVENTORY: List[Dict[str, Any]] = [
         "recommendation": "Crisp green turgor pressure optimal. Prime for Caesar salads and burger garnishes."
     },
     {
-        "id": "inv-004",
+        "id": "inv-005",
         "name": "Vine-Ripened Cherry Tomatoes",
         "category": "Vegetables",
         "storage_zone": "Zone 2: Leafy Greens & Vegetable Crisper Vault",
@@ -157,7 +180,7 @@ INITIAL_INVENTORY: List[Dict[str, Any]] = [
         "recommendation": "Good firm texture. Schedule into pasta sauces and salads over the next 24-36h."
     },
     {
-        "id": "inv-005",
+        "id": "inv-006",
         "name": "Fresh Baby Spinach Leaves",
         "category": "Vegetables",
         "storage_zone": "Zone 2: Leafy Greens & Vegetable Crisper Vault",
@@ -176,8 +199,10 @@ INITIAL_INVENTORY: List[Dict[str, Any]] = [
         "status": "Action Required",
         "recommendation": "Leaf Wilting & Chlorosis: Blanch and freeze or cook immediately in spinach pasta / soup today."
     },
+
+    # 3. Dairy
     {
-        "id": "inv-006",
+        "id": "inv-007",
         "name": "Pasteurized Fresh Whole Milk (1L x 24)",
         "category": "Dairy",
         "storage_zone": "Zone 3: Dairy & Pastry Refrigerator",
@@ -197,7 +222,71 @@ INITIAL_INVENTORY: List[Dict[str, Any]] = [
         "recommendation": "Optimal lactic stability. Standard espresso bar & bakery rotation."
     },
     {
-        "id": "inv-007",
+        "id": "inv-008",
+        "name": "Fresh Mozzarella Cheese Blocks",
+        "category": "Dairy",
+        "storage_zone": "Zone 3: Dairy & Pastry Refrigerator",
+        "batch_number": "BAT-2026-MZ08",
+        "quantity": "10.0 kg",
+        "stored_at": (datetime.now() - timedelta(hours=96)).strftime("%Y-%m-%d %H:%M"),
+        "storage_duration_hours": 96.0,
+        "current_temp": 3.4,
+        "current_humidity": 68.0,
+        "current_nh3": 0.05,
+        "current_co2": 440.0,
+        "current_voc": 0.16,
+        "spoilage_prob": 34.0,
+        "remaining_shelf_life_hours": 64.0,
+        "risk_level": "Medium",
+        "status": "Moderate",
+        "recommendation": "Keep in chilled brine solution. Rotate into pizza and lasagne prep."
+    },
+
+    # 4. Fish & Seafood
+    {
+        "id": "inv-009",
+        "name": "Yellowfin Tuna Steaks",
+        "category": "Fish",
+        "storage_zone": "Zone 5: Seafood Ice Preservation Bed",
+        "batch_number": "BAT-2026-TU02",
+        "quantity": "8.0 kg",
+        "stored_at": (datetime.now() - timedelta(hours=18)).strftime("%Y-%m-%d %H:%M"),
+        "storage_duration_hours": 18.0,
+        "current_temp": 1.1,
+        "current_humidity": 86.0,
+        "current_nh3": 0.08,
+        "current_co2": 440.0,
+        "current_voc": 0.14,
+        "spoilage_prob": 14.0,
+        "remaining_shelf_life_hours": 32.0,
+        "risk_level": "Low",
+        "status": "Fresh",
+        "recommendation": "Maintain crushed ice bed. Optimal for sashimi / pan-sear specials."
+    },
+    {
+        "id": "inv-010",
+        "name": "Norwegian Salmon Fillet Portions",
+        "category": "Fish",
+        "storage_zone": "Zone 5: Seafood Ice Preservation Bed",
+        "batch_number": "BAT-2026-SL14",
+        "quantity": "12.5 kg",
+        "stored_at": (datetime.now() - timedelta(hours=28)).strftime("%Y-%m-%d %H:%M"),
+        "storage_duration_hours": 28.0,
+        "current_temp": 1.3,
+        "current_humidity": 85.5,
+        "current_nh3": 0.11,
+        "current_co2": 460.0,
+        "current_voc": 0.18,
+        "spoilage_prob": 28.0,
+        "remaining_shelf_life_hours": 22.0,
+        "risk_level": "Medium",
+        "status": "Fresh",
+        "recommendation": "Bright orange flesh & firm texture. Schedule for dinner grill service."
+    },
+
+    # 5. Meat & Poultry
+    {
+        "id": "inv-011",
         "name": "Fresh Chicken Breast Fillet",
         "category": "Meat",
         "storage_zone": "Zone 4: Walk-In Poultry & Meat Chiller",
@@ -217,24 +306,24 @@ INITIAL_INVENTORY: List[Dict[str, Any]] = [
         "recommendation": "Priority Use: Dispatch for chicken curry / grill prep immediately today."
     },
     {
-        "id": "inv-008",
-        "name": "Yellowfin Tuna Steaks",
-        "category": "Fish",
-        "storage_zone": "Zone 5: Seafood Ice preservation Bed",
-        "batch_number": "BAT-2026-TU02",
-        "quantity": "8.0 kg",
-        "stored_at": (datetime.now() - timedelta(hours=18)).strftime("%Y-%m-%d %H:%M"),
-        "storage_duration_hours": 18.0,
-        "current_temp": 1.1,
-        "current_humidity": 86.0,
-        "current_nh3": 0.08,
-        "current_co2": 440.0,
-        "current_voc": 0.14,
-        "spoilage_prob": 14.0,
-        "remaining_shelf_life_hours": 32.0,
+        "id": "inv-012",
+        "name": "Grass-Fed Beef Sirloin",
+        "category": "Meat",
+        "storage_zone": "Zone 4: Walk-In Poultry & Meat Chiller",
+        "batch_number": "BAT-2026-BF04",
+        "quantity": "14.0 kg",
+        "stored_at": (datetime.now() - timedelta(hours=30)).strftime("%Y-%m-%d %H:%M"),
+        "storage_duration_hours": 30.0,
+        "current_temp": 3.6,
+        "current_humidity": 76.0,
+        "current_nh3": 0.16,
+        "current_co2": 510.0,
+        "current_voc": 0.22,
+        "spoilage_prob": 26.5,
+        "remaining_shelf_life_hours": 62.0,
         "risk_level": "Low",
         "status": "Fresh",
-        "recommendation": "Maintain crushed ice bed. Optimal for sashimi / pan-sear specials."
+        "recommendation": "Healthy oxymyoglobin color. Normal aging progression."
     }
 ]
 
