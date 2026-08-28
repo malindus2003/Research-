@@ -1,5 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, Zap, Sliders, ArrowRight, CheckCircle2, AlertTriangle, XCircle, ShieldAlert, Sparkles, Apple, Carrot, Milk, Fish, Beef } from 'lucide-react';
+import { 
+  Cpu, 
+  Zap, 
+  Sliders, 
+  ArrowRight, 
+  CheckCircle2, 
+  AlertTriangle, 
+  XCircle, 
+  ShieldAlert, 
+  Sparkles, 
+  Apple, 
+  Carrot, 
+  Milk, 
+  Fish, 
+  Beef,
+  Clock,
+  Hourglass,
+  TrendingDown
+} from 'lucide-react';
 import axios from 'axios';
 
 const QUICK_PRESETS = [
@@ -80,7 +98,7 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
         category: category,
         storage_duration_hours: Number(storageHours),
         sensor_data: {
-          storage_zone: selectedZone ? selectedZone.name : "Cold Storage",
+          storage_zone: selectedZone?.name || "Main Storage",
           temperature: Number(temp),
           humidity: Number(humidity),
           nh3: Number(nh3),
@@ -88,13 +106,11 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
           voc: Number(voc)
         },
         vision_data: useVision ? {
-          category: category,
           discoloration_score: Number(discoloration),
           mould_detected: mouldDetected,
-          mould_coverage: mouldDetected ? 5.0 : 0.0,
-          ripeness_stage: mouldDetected ? "Spoiled / Rotten" : (discoloration > 20 ? "Overripe / Wilting" : "Fresh / Optimal"),
+          mould_coverage: mouldDetected ? 12.0 : 0.0,
           texture_degradation: Number(textureDegradation),
-          visual_spoilage_score: mouldDetected ? 85.0 : Number(discoloration * 1.5 + textureDegradation * 0.5)
+          visual_spoilage_score: Number(discoloration) + (mouldDetected ? 50 : 0)
         } : null
       };
 
@@ -110,42 +126,42 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
   const getRiskBadge = (level) => {
     switch (level) {
       case "Low":
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> LOW RISK (FRESH)</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> LOW RISK (FRESH)</span>;
       case "Medium":
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> MEDIUM RISK</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> MEDIUM RISK</span>;
       case "High":
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30 flex items-center gap-1"><ShieldAlert className="h-3.5 w-3.5" /> HIGH RISK (USE FIRST)</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-50 text-orange-900 border border-orange-300 flex items-center gap-1"><ShieldAlert className="h-3.5 w-3.5" /> HIGH RISK (PRIORITY)</span>;
       case "Critical":
       default:
-        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 animate-pulse"><XCircle className="h-3.5 w-3.5" /> CRITICAL (DISPOSE)</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-900 border border-rose-300 flex items-center gap-1 animate-pulse"><XCircle className="h-3.5 w-3.5" /> CRITICAL (DISPOSE)</span>;
     }
   };
 
   return (
-    <div className="glass-panel p-6 rounded-2xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+    <div className="glass-panel p-6 rounded-2xl space-y-5 bg-white border border-[#d1ded5]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e1eae4] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white">Universal AI Spoilage & Shelf-Life Assessor</h2>
-            <span className="text-xs px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium flex items-center gap-1">
-              <Cpu className="h-3.5 w-3.5" /> All Food Categories Model
+            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Universal AI Spoilage & Shelf-Life Assessor</h2>
+            <span className="text-xs px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold flex items-center gap-1">
+              <Cpu className="h-3.5 w-3.5" /> Multi-Modal Fusion Engine
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">
             Merges physical gas & climate sensors with visual CV indicators across Fruits, Veg, Dairy, Fish & Meat
           </p>
         </div>
       </div>
 
       {/* Preset Quick Buttons */}
-      <div className="mt-4">
-        <span className="text-xs font-semibold text-slate-400">Quick Test Items:</span>
-        <div className="flex flex-wrap gap-2 mt-1.5">
+      <div>
+        <span className="text-xs font-bold text-slate-700">Quick Test Presets:</span>
+        <div className="flex flex-wrap gap-2 mt-2">
           {QUICK_PRESETS.map((p, idx) => (
             <button
               key={idx}
               onClick={() => applyPreset(p)}
-              className="px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 transition-colors"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-50 border border-[#d1ded5] text-xs font-bold text-slate-800 transition-all shadow-sm"
             >
               {p.name} ({p.category})
             </button>
@@ -153,32 +169,32 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-2">
         
         {/* Controls & Simulators */}
-        <div className="lg:col-span-6 space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+        <div className="lg:col-span-6 space-y-4 bg-[#f8faf9] p-5 rounded-2xl border border-[#d1ded5] shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-              <Sliders className="h-4 w-4 text-emerald-400" /> Multi-Source Input Parameters
+            <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+              <Sliders className="h-4 w-4 text-emerald-700" /> Multi-Source Input Parameters
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] text-slate-400 font-medium">Food Item Name</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Food Item Name</label>
               <input
                 type="text"
                 value={itemName}
                 onChange={(e) => setItemName(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 mt-1"
+                className="w-full bg-white border border-[#c6d7cd] rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-emerald-600 shadow-sm"
               />
             </div>
             <div>
-              <label className="text-[11px] text-slate-400 font-medium">Food Category</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Food Category</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 mt-1"
+                className="w-full bg-white border border-[#c6d7cd] rounded-xl px-3 py-2 text-xs text-slate-900 font-bold focus:outline-none focus:border-emerald-600 shadow-sm"
               >
                 <option value="Fruits">Fruits (Bananas, Strawberries, Apples...)</option>
                 <option value="Vegetables">Vegetables (Lettuce, Spinach, Tomatoes...)</option>
@@ -190,9 +206,9 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
           </div>
 
           <div>
-            <div className="flex justify-between text-xs">
-              <span className="text-slate-400">Storage Elapsed Duration:</span>
-              <span className="font-bold text-emerald-400">{storageHours} Hours ({(storageHours / 24.0).toFixed(1)} days)</span>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-slate-600 font-bold">Storage Elapsed Duration:</span>
+              <span className="font-bold text-emerald-800">{storageHours} Hours ({(storageHours / 24.0).toFixed(1)} days)</span>
             </div>
             <input
               type="range"
@@ -200,19 +216,19 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
               max="168"
               value={storageHours}
               onChange={(e) => setStorageHours(e.target.value)}
-              className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 mt-1"
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-700"
             />
           </div>
 
           {/* Sensor Parameter Sliders */}
-          <div className="pt-2 border-t border-slate-800/80 space-y-3">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">IoT Sensor Telemetry</span>
+          <div className="pt-3 border-t border-[#e1eae4] space-y-3">
+            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">IoT Sensor Telemetry</span>
             
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-400">Temp:</span>
-                  <span className="font-mono text-white">{temp}°C</span>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-600 font-medium">Temp:</span>
+                  <span className="font-mono font-bold text-slate-900">{temp}°C</span>
                 </div>
                 <input
                   type="range"
@@ -221,14 +237,14 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
                   step="0.5"
                   value={temp}
                   onChange={(e) => setTemp(e.target.value)}
-                  className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-rose-500"
+                  className="w-full h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-rose-600"
                 />
               </div>
 
               <div>
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-400">Humidity:</span>
-                  <span className="font-mono text-white">{humidity}%</span>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-600 font-medium">Humidity:</span>
+                  <span className="font-mono font-bold text-slate-900">{humidity}%</span>
                 </div>
                 <input
                   type="range"
@@ -236,16 +252,16 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
                   max="98"
                   value={humidity}
                   onChange={(e) => setHumidity(e.target.value)}
-                  className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-sky-500"
+                  className="w-full h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-sky-600"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-slate-400">NH₃ (ppm):</span>
-                  <span className="font-mono text-purple-400">{nh3}</span>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-600">NH₃ (ppm):</span>
+                  <span className="font-mono font-bold text-purple-700">{nh3}</span>
                 </div>
                 <input
                   type="range"
@@ -254,14 +270,14 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
                   step="0.01"
                   value={nh3}
                   onChange={(e) => setNh3(e.target.value)}
-                  className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-purple-500"
+                  className="w-full h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-purple-600"
                 />
               </div>
 
               <div>
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-slate-400">CO₂ (ppm):</span>
-                  <span className="font-mono text-emerald-400">{co2}</span>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-600">CO₂ (ppm):</span>
+                  <span className="font-mono font-bold text-emerald-800">{co2}</span>
                 </div>
                 <input
                   type="range"
@@ -270,14 +286,14 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
                   step="25"
                   value={co2}
                   onChange={(e) => setCo2(e.target.value)}
-                  className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-emerald-500"
+                  className="w-full h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-emerald-700"
                 />
               </div>
 
               <div>
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-slate-400">VOC / Ethylene:</span>
-                  <span className="font-mono text-amber-400">{voc}</span>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-slate-600">VOC / Ethylene:</span>
+                  <span className="font-mono font-bold text-amber-700">{voc}</span>
                 </div>
                 <input
                   type="range"
@@ -286,33 +302,33 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
                   step="0.02"
                   value={voc}
                   onChange={(e) => setVoc(e.target.value)}
-                  className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-amber-500"
+                  className="w-full h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-amber-600"
                 />
               </div>
             </div>
           </div>
 
           {/* Computer Vision Toggle */}
-          <div className="pt-2 border-t border-slate-800/80">
+          <div className="pt-3 border-t border-[#e1eae4]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Vision Features</span>
-              <label className="flex items-center gap-1.5 cursor-pointer text-xs text-slate-300">
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Vision Features</span>
+              <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
                 <input
                   type="checkbox"
                   checked={useVision}
                   onChange={(e) => setUseVision(e.target.checked)}
-                  className="rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-0"
+                  className="rounded bg-slate-100 border-slate-300 text-emerald-600 focus:ring-0"
                 />
                 Enable CV Fusion
               </label>
             </div>
 
             {useVision && (
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-2 gap-3 mt-3">
                 <div>
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-slate-400">Browning / Bruise:</span>
-                    <span className="font-mono text-white">{discoloration}%</span>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-slate-600 font-medium">Browning / Bruise:</span>
+                    <span className="font-mono font-bold text-slate-900">{discoloration}%</span>
                   </div>
                   <input
                     type="range"
@@ -320,16 +336,16 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
                     max="60"
                     value={discoloration}
                     onChange={(e) => setDiscoloration(e.target.value)}
-                    className="w-full h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-slate-400"
+                    className="w-full h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-emerald-700"
                   />
                 </div>
                 <div className="flex items-center justify-center pt-2">
-                  <label className="flex items-center gap-1.5 cursor-pointer text-xs text-rose-300">
+                  <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-rose-700">
                     <input
                       type="checkbox"
                       checked={mouldDetected}
                       onChange={(e) => setMouldDetected(e.target.checked)}
-                      className="rounded bg-slate-800 border-slate-700 text-rose-500 focus:ring-0"
+                      className="rounded bg-slate-100 border-slate-300 text-rose-600 focus:ring-0"
                     />
                     Fungal Spores / Mould
                   </label>
@@ -339,39 +355,41 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
           </div>
         </div>
 
-        {/* Prediction Results & Action Recommendations */}
+        {/* Prediction Results & Remaining Shelf Life Breakdown */}
         <div className="lg:col-span-6 flex flex-col justify-between space-y-4">
           {prediction && (
-            <div className="bg-slate-900/90 p-5 rounded-xl border border-slate-800 flex flex-col h-full justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-[#d1ded5] flex flex-col h-full justify-between shadow-sm space-y-4">
               
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400 uppercase font-semibold tracking-wider">
-                    {prediction.category} Spoilage Assessment
+                  <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
+                    {prediction.category} Spoilage & Shelf-Life Assessment
                   </span>
                   {getRiskBadge(prediction.risk_level)}
                 </div>
 
                 {/* Big Metric Gauges */}
                 <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80">
-                    <span className="text-xs text-slate-400">Remaining Shelf-Life (RSL)</span>
-                    <div className="text-3xl font-extrabold text-emerald-400 mt-1">
-                      {prediction.remaining_shelf_life_hours} <span className="text-sm font-normal text-slate-400">hours</span>
+                  <div className="p-4 rounded-xl bg-[#ecfdf5] border border-emerald-200 shadow-sm">
+                    <span className="text-xs text-emerald-900 font-bold flex items-center gap-1">
+                      <Hourglass className="h-4 w-4 text-emerald-700" /> Remaining Shelf-Life
+                    </span>
+                    <div className="text-3xl font-black text-emerald-800 mt-1">
+                      {prediction.remaining_shelf_life_hours} <span className="text-sm font-normal text-slate-600">hrs</span>
                     </div>
-                    <span className="text-[11px] text-slate-500 mt-0.5 block">
+                    <span className="text-xs text-emerald-700 mt-1 block font-semibold">
                       Approx. {(prediction.remaining_shelf_life_hours / 24.0).toFixed(1)} days usable
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80">
-                    <span className="text-xs text-slate-400">Spoilage Probability</span>
-                    <div className="text-3xl font-extrabold text-rose-400 mt-1">
-                      {prediction.spoilage_probability} <span className="text-sm font-normal text-slate-400">%</span>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
+                    <span className="text-xs text-slate-600 font-bold">Spoilage Probability</span>
+                    <div className="text-3xl font-black text-rose-600 mt-1">
+                      {prediction.spoilage_probability} <span className="text-sm font-normal text-slate-500">%</span>
                     </div>
-                    <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
+                    <div className="w-full bg-slate-200 rounded-full h-2 mt-2 overflow-hidden">
                       <div 
-                        className="bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-500 h-1.5 rounded-full" 
+                        className="bg-gradient-to-r from-emerald-600 via-amber-500 to-rose-600 h-2 rounded-full" 
                         style={{ width: `${Math.min(100, prediction.spoilage_probability)}%` }}
                       />
                     </div>
@@ -380,10 +398,10 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
 
                 {/* Dominant Spoilage Factors */}
                 <div className="mt-4">
-                  <span className="text-xs font-semibold text-slate-300">Identified Spoilage Drivers:</span>
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  <span className="text-xs font-bold text-slate-800">Identified Spoilage Drivers:</span>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
                     {prediction.dominant_spoilage_factors.map((factor, i) => (
-                      <span key={i} className="px-2 py-1 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700/80">
+                      <span key={i} className="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#f0f5f2] text-slate-800 border border-[#d1ded5]">
                         {factor}
                       </span>
                     ))}
@@ -392,13 +410,13 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
               </div>
 
               {/* Actionable Recommendations */}
-              <div className="mt-4 pt-4 border-t border-slate-800">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5" /> Intelligent Culinary Recommendation ({prediction.category})
+              <div className="mt-4 pt-4 border-t border-[#e1eae4]">
+                <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+                  <Sparkles className="h-4 w-4 text-emerald-700" /> Culinary & Preservation Directive ({prediction.category})
                 </span>
-                <div className="mt-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200">
-                  <strong className="block text-amber-300 font-semibold mb-0.5">{prediction.storage_action}</strong>
-                  <ul className="space-y-1 mt-1 list-disc list-inside text-[11px] text-amber-200/90">
+                <div className="mt-2 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs shadow-sm">
+                  <strong className="block text-emerald-900 font-bold mb-1">{prediction.storage_action}</strong>
+                  <ul className="space-y-1 list-disc list-inside text-xs font-medium">
                     {prediction.recommendations.map((rec, i) => (
                       <li key={i}>{rec}</li>
                     ))}

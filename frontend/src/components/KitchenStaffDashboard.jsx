@@ -3,7 +3,7 @@ import { Users, Clock, Flame, Award, AlertTriangle, ArrowRight, ShieldCheck, Che
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import axios from 'axios';
 
-export default function KitchenStaffDashboard() {
+export default function KitchenStaffDashboard({ isDarkMode }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,9 +25,9 @@ export default function KitchenStaffDashboard() {
 
   if (loading || !data) {
     return (
-      <div className="glass-panel p-12 text-center text-slate-400 rounded-2xl">
+      <div className="glass-panel p-12 text-center text-slate-500 rounded-2xl">
         <div className="animate-spin h-8 w-8 border-2 border-orange-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-        <p className="text-xs font-mono">Loading Kitchen & Staff Metrics...</p>
+        <p className="text-xs font-bold font-mono">Loading Kitchen & Staff Metrics...</p>
       </div>
     );
   }
@@ -36,41 +36,41 @@ export default function KitchenStaffDashboard() {
     <div className="space-y-6">
       
       {/* Top Banner */}
-      <div className="glass-panel p-6 rounded-2xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="glass-panel p-6 rounded-2xl space-y-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-white">Kitchen Efficiency & Dynamic Staff Optimization</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Kitchen Efficiency & Dynamic Staff Optimization</h2>
+              <span className="text-xs px-2.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 font-bold">
                 Workflow & Bottleneck AI
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
               Real-time line bottleneck monitoring, peak-hour staff allocation, and staff progression
             </p>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <span className="text-[11px] text-slate-400">Kitchen Overall Efficiency</span>
-              <div className="text-lg font-extrabold text-emerald-400">{data.overall_kitchen_efficiency}</div>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Kitchen Overall Efficiency</span>
+              <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">{data.overall_kitchen_efficiency}</div>
             </div>
-            <div className="text-right border-l border-slate-800 pl-4">
-              <span className="text-[11px] text-slate-400">Avg Prep Time</span>
-              <div className="text-lg font-extrabold text-white">{data.avg_ticket_fulfillment_time}</div>
+            <div className="text-right border-l border-slate-200 dark:border-slate-800 pl-4">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Avg Prep Time</span>
+              <div className="text-xl font-black text-slate-900 dark:text-white">{data.avg_ticket_fulfillment_time}</div>
             </div>
           </div>
         </div>
 
         {/* AI Actionable Directives */}
-        <div className="mt-4 p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
-          <span className="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
-            <Flame className="h-4 w-4" /> AI Dynamic Staff Allocation Directives
+        <div className="p-4 rounded-2xl bg-orange-50 border border-orange-200 dark:bg-orange-500/10 dark:border-orange-500/30 shadow-sm">
+          <span className="text-xs font-black text-orange-800 dark:text-orange-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+            <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400" /> AI Dynamic Staff Allocation Directives
           </span>
-          <ul className="space-y-1.5 text-xs text-slate-200">
+          <ul className="space-y-1.5 text-xs text-orange-950 dark:text-slate-200 font-medium">
             {data.ai_allocation_suggestions.map((s, idx) => (
               <li key={idx} className="flex items-start gap-2">
-                <ArrowRight className="h-3.5 w-3.5 text-orange-400 flex-shrink-0 mt-0.5" />
+                <ArrowRight className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
                 <span>{s}</span>
               </li>
             ))}
@@ -79,13 +79,13 @@ export default function KitchenStaffDashboard() {
       </div>
 
       {/* Peak-Hour Workload & Staffing Demand Chart */}
-      <div className="glass-panel p-6 rounded-2xl">
-        <div className="flex items-center justify-between mb-4">
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
-            <h3 className="text-base font-bold text-white">Peak-Hour Workload & Staffing Forecast (11:00 - 22:00)</h3>
-            <p className="text-xs text-slate-400">Hourly projected kitchen orders and dynamic cook allocation requirements</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Peak-Hour Workload & Staffing Forecast (11:00 - 22:00)</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Hourly projected kitchen orders and dynamic cook allocation requirements</p>
           </div>
-          <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded border border-orange-500/20">
+          <span className="text-xs font-bold text-orange-800 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 px-3 py-1.5 rounded-xl border border-orange-200 dark:border-orange-500/20 shadow-sm">
             Dinner Rush: 19:00 - 20:30
           </span>
         </div>
@@ -93,16 +93,23 @@ export default function KitchenStaffDashboard() {
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data.hourly_peak_forecast}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="hour" stroke="#64748b" fontSize={11} />
-              <YAxis stroke="#64748b" fontSize={11} yAxisId="left" />
-              <YAxis stroke="#64748b" fontSize={11} yAxisId="right" orientation="right" domain={[0, 12]} />
+              <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#1e293b" : "#e2e8f0"} />
+              <XAxis dataKey="hour" stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} />
+              <YAxis stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} yAxisId="left" />
+              <YAxis stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} yAxisId="right" orientation="right" domain={[0, 12]} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
+                contentStyle={{
+                  backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+                  borderColor: isDarkMode ? '#334155' : '#cbd5e1',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  color: isDarkMode ? '#f8fafc' : '#0f172a',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
               />
               <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
               <Line yAxisId="left" type="monotone" dataKey="predicted_orders" stroke="#f97316" strokeWidth={3} name="Predicted Orders" dot={{ r: 3 }} />
-              <Line yAxisId="right" type="stepAfter" dataKey="staff_required" stroke="#10b981" strokeWidth={2} name="Chefs Required" />
+              <Line yAxisId="right" type="stepAfter" dataKey="staff_required" stroke="#10b981" strokeWidth={2.5} name="Chefs Required" />
               <Line yAxisId="right" type="stepAfter" dataKey="actual_staff" stroke="#64748b" strokeWidth={2} strokeDasharray="4 4" name="Scheduled Chefs" />
             </LineChart>
           </ResponsiveContainer>
@@ -110,11 +117,11 @@ export default function KitchenStaffDashboard() {
       </div>
 
       {/* Kitchen Station Bottleneck Monitors */}
-      <div className="glass-panel p-6 rounded-2xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
-            <h3 className="text-base font-bold text-white">Real-Time Kitchen Station Workload & Bottlenecks</h3>
-            <p className="text-xs text-slate-400">Monitoring queue latency and load balancing across all 4 production stations</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Real-Time Kitchen Station Workload & Bottlenecks</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Monitoring queue latency and load balancing across all 4 production stations</p>
           </div>
         </div>
 
@@ -122,41 +129,41 @@ export default function KitchenStaffDashboard() {
           {data.stations.map((st) => (
             <div
               key={st.id}
-              className={`p-4 rounded-xl border flex flex-col justify-between ${
+              className={`p-5 rounded-2xl border flex flex-col justify-between shadow-sm transition-all ${
                 st.load_level > 85
-                  ? 'bg-rose-500/10 border-rose-500/40 glow-rose'
-                  : (st.load_level > 65 ? 'bg-amber-500/10 border-amber-500/40' : 'bg-slate-900/60 border-slate-800')
+                  ? 'bg-rose-50 border-rose-300 dark:bg-rose-500/10 dark:border-rose-500/40'
+                  : (st.load_level > 65 ? 'bg-amber-50 border-amber-300 dark:bg-amber-500/10 dark:border-amber-500/40' : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800')
               }`}
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">{st.name}</span>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                    st.load_level > 85 ? 'bg-rose-500 text-white' : 'bg-slate-800 text-slate-300'
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">{st.name}</span>
+                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                    st.load_level > 85 ? 'bg-rose-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300'
                   }`}>
                     {st.load_level}% Load
                   </span>
                 </div>
 
-                <div className="mt-3 space-y-1.5 text-xs text-slate-300">
+                <div className="mt-4 space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Current Queue:</span>
-                    <span className="font-bold text-white">{st.queue_length} tickets</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Current Queue:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{st.queue_length} tickets</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Avg Prep Time:</span>
-                    <span className="font-bold text-white">{st.avg_prep_time_mins} mins</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Avg Prep Time:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{st.avg_prep_time_mins} mins</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Cooks Assigned:</span>
-                    <span className="font-bold text-white">{st.active_cooks} (Target: {st.recommended_cooks})</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Cooks Assigned:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{st.active_cooks} (Target: {st.recommended_cooks})</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800/80">
-                <span className="text-[10px] uppercase font-bold text-slate-400">Recommendation:</span>
-                <p className="text-xs text-slate-200 mt-0.5">{st.action}</p>
+              <div className="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
+                <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">Recommendation:</span>
+                <p className="text-xs text-slate-800 dark:text-slate-200 mt-0.5 font-bold">{st.action}</p>
               </div>
             </div>
           ))}
@@ -164,46 +171,46 @@ export default function KitchenStaffDashboard() {
       </div>
 
       {/* Staff Skill Matrix */}
-      <div className="glass-panel p-6 rounded-2xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
-            <h3 className="text-base font-bold text-white">Staff Skill-Gap Analysis & Progression Paths</h3>
-            <p className="text-xs text-slate-400">Personalized training recommendations and succession planning for kitchen personnel</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Staff Skill-Gap Analysis & Progression Paths</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Personalized training recommendations and succession planning for kitchen personnel</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {data.staff.map((member) => (
-            <div key={member.id} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
+            <div key={member.id} className="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-white">{member.name}</h4>
-                  <span className="text-[10px] text-slate-400">{member.assigned_station}</span>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">{member.name}</h4>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{member.assigned_station}</span>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 text-[10px] font-black border border-emerald-200 dark:border-emerald-500/30">
                   {member.skill_level}
                 </span>
               </div>
 
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between text-slate-300">
-                  <span className="text-slate-400">Efficiency Rating:</span>
-                  <span className="font-bold text-emerald-400">{member.efficiency_rating}%</span>
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-500 dark:text-slate-400 font-medium">Efficiency Rating:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{member.efficiency_rating}%</span>
                 </div>
-                <div className="text-[11px] text-slate-400">
-                  Identified Skill-Gap: <span className="text-amber-300">{member.skill_gap}</span>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Identified Skill-Gap: <span className="text-amber-700 dark:text-amber-300 font-bold">{member.skill_gap}</span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80 text-xs">
-                <span className="text-[10px] font-bold text-purple-400 flex items-center gap-1">
-                  <Award className="h-3 w-3" /> Personalized Training:
+              <div className="p-3 rounded-xl bg-purple-50 dark:bg-slate-950/60 border border-purple-100 dark:border-slate-800/80 text-xs">
+                <span className="text-[10px] font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1">
+                  <Award className="h-3.5 w-3.5" /> Personalized Training:
                 </span>
-                <p className="text-slate-300 text-[11px] mt-0.5">{member.training_recommendation}</p>
+                <p className="text-slate-700 dark:text-slate-300 text-xs mt-1 font-medium">{member.training_recommendation}</p>
               </div>
 
-              <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1 pt-1">
-                <CheckCircle2 className="h-3.5 w-3.5" />
+              <div className="text-xs text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 pt-1">
+                <CheckCircle2 className="h-4 w-4" />
                 <span>{member.career_progression}</span>
               </div>
             </div>

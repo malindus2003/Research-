@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Cpu, Send, CheckCircle, RefreshCw, Flame, AlertOctagon, Radio, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
 
-export default function ESP32Simulator({ zones, onTelemetrySent }) {
+export default function ESP32Simulator({ zones, onTelemetrySent, isDarkMode }) {
   const [selectedZone, setSelectedZone] = useState(zones[0]?.id || "zone-fruit");
   const [temp, setTemp] = useState(4.2);
   const [humidity, setHumidity] = useState(78.0);
@@ -90,16 +90,16 @@ export default function ESP32Simulator({ zones, onTelemetrySent }) {
     <div className="space-y-6">
       
       {/* Simulator Control Panel */}
-      <div className="glass-panel p-6 rounded-2xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="glass-panel p-6 rounded-2xl space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-white">ESP32 Microcontroller Hardware Simulator</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">ESP32 Microcontroller Hardware Simulator</h2>
+              <span className="text-xs px-2.5 py-0.5 rounded bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 border border-sky-200 dark:border-sky-500/20 font-mono font-bold">
                 POST /api/sensors/telemetry
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
               Emulate real-time wireless packets transmitted by ESP32 sensor nodes in storage containers
             </p>
           </div>
@@ -108,27 +108,27 @@ export default function ESP32Simulator({ zones, onTelemetrySent }) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => simulatePreset("anomaly")}
-              className="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow"
+              className="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
             >
-              <Flame className="h-4 w-4 text-rose-400" /> Simulate Spoilage Anomaly
+              <Flame className="h-4 w-4 text-rose-600 dark:text-rose-400" /> Simulate Spoilage Anomaly
             </button>
             <button
               onClick={() => simulatePreset("normal")}
-              className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow"
+              className="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
             >
-              <CheckCircle className="h-4 w-4 text-emerald-400" /> Reset Baseline
+              <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> Reset Baseline
             </button>
           </div>
         </div>
 
         {/* Input Parameters Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 mt-5 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 mt-4 text-xs">
           <div>
-            <label className="text-slate-300 font-medium">Target Storage Node</label>
+            <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">Target Storage Node</label>
             <select
               value={selectedZone}
               onChange={(e) => setSelectedZone(e.target.value)}
-              className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white focus:outline-none focus:border-sky-500"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-sky-500 shadow-sm"
             >
               {zones.map(z => (
                 <option key={z.id} value={z.id}>{z.name.split(':')[0]} ({z.category})</option>
@@ -137,46 +137,46 @@ export default function ESP32Simulator({ zones, onTelemetrySent }) {
           </div>
 
           <div>
-            <label className="text-slate-300 font-medium">Temp (°C)</label>
+            <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">Temp (°C)</label>
             <input
               type="number"
               step="0.1"
               value={temp}
               onChange={(e) => setTemp(e.target.value)}
-              className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white focus:outline-none focus:border-sky-500"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-sky-500 shadow-sm"
             />
           </div>
 
           <div>
-            <label className="text-slate-300 font-medium">Humidity (%)</label>
+            <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">Humidity (%)</label>
             <input
               type="number"
               step="0.5"
               value={humidity}
               onChange={(e) => setHumidity(e.target.value)}
-              className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white focus:outline-none focus:border-sky-500"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-sky-500 shadow-sm"
             />
           </div>
 
           <div>
-            <label className="text-slate-300 font-medium">NH₃ (ppm)</label>
+            <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">NH₃ (ppm)</label>
             <input
               type="number"
               step="0.01"
               value={nh3}
               onChange={(e) => setNh3(e.target.value)}
-              className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white focus:outline-none focus:border-sky-500"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-sky-500 shadow-sm"
             />
           </div>
 
           <div>
-            <label className="text-slate-300 font-medium">CO₂ (ppm)</label>
+            <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">CO₂ (ppm)</label>
             <input
               type="number"
               step="10"
               value={co2}
               onChange={(e) => setCo2(e.target.value)}
-              className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-white focus:outline-none focus:border-sky-500"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-sky-500 shadow-sm"
             />
           </div>
 
@@ -184,7 +184,7 @@ export default function ESP32Simulator({ zones, onTelemetrySent }) {
             <button
               onClick={() => handleSendTelemetry()}
               disabled={sending}
-              className="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 shadow-lg shadow-sky-600/25 transition-colors"
+              className="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-sky-600/25 transition-colors"
             >
               <Send className="h-4 w-4" /> Broadcast Packet
             </button>
@@ -192,44 +192,44 @@ export default function ESP32Simulator({ zones, onTelemetrySent }) {
         </div>
 
         {statusMsg && (
-          <div className="mt-4 p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs text-sky-300 font-mono flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-sky-400 flex-shrink-0" />
+          <div className="mt-4 p-3 rounded-xl bg-sky-50 border border-sky-200 dark:bg-sky-500/10 dark:border-sky-500/30 text-xs text-sky-800 dark:text-sky-300 font-mono flex items-center gap-2 font-bold shadow-sm">
+            <CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400 flex-shrink-0" />
             <span>{statusMsg}</span>
           </div>
         )}
       </div>
 
       {/* Live Wireless Telemetry Packet Log Feed */}
-      <div className="glass-panel p-6 rounded-2xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Radio className="h-4 w-4 text-emerald-400 animate-pulse" /> Live Telemetry Ingestion Activity Stream
+            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Radio className="h-4 w-4 text-emerald-600 dark:text-emerald-400 animate-pulse" /> Live Telemetry Ingestion Activity Stream
             </h3>
-            <p className="text-xs text-slate-400">Incoming sensor packets logged from connected ESP32 hardware</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Incoming sensor packets logged from connected ESP32 hardware</p>
           </div>
-          <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 text-emerald-400 border border-slate-700">
+          <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-slate-800 dark:text-emerald-400 dark:border-slate-700 font-bold">
             HTTP/REST Ingest: ACTIVE
           </span>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-800">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-900/90 text-slate-400 uppercase font-semibold border-b border-slate-800">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 shadow-sm">
+          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+            <thead className="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="py-2.5 px-4">Timestamp</th>
-                <th className="py-2.5 px-4">Target Storage Zone</th>
-                <th className="py-2.5 px-4">Sensory Telemetry Payload</th>
-                <th className="py-2.5 px-4 text-right">HTTP Status</th>
+                <th className="py-3 px-4">Timestamp</th>
+                <th className="py-3 px-4">Target Storage Zone</th>
+                <th className="py-3 px-4">Sensory Telemetry Payload</th>
+                <th className="py-3 px-4 text-right">HTTP Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 bg-slate-900/40 font-mono text-[11px]">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-mono text-xs">
               {packetLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-800/40">
-                  <td className="py-2.5 px-4 text-slate-400">{log.time}</td>
-                  <td className="py-2.5 px-4 font-bold text-white">{log.zone}</td>
-                  <td className="py-2.5 px-4 text-slate-300">{log.payload}</td>
-                  <td className="py-2.5 px-4 text-right text-emerald-400 font-bold">{log.status}</td>
+                <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                  <td className="py-3 px-4 text-slate-500 dark:text-slate-400">{log.time}</td>
+                  <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">{log.zone}</td>
+                  <td className="py-3 px-4 text-slate-700 dark:text-slate-300">{log.payload}</td>
+                  <td className="py-3 px-4 text-right text-emerald-600 dark:text-emerald-400 font-black">{log.status}</td>
                 </tr>
               ))}
             </tbody>
