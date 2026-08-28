@@ -3,7 +3,7 @@ import { Thermometer, Droplets, Wind, Gauge, Activity, AlertCircle, CheckCircle 
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import axios from 'axios';
 
-export default function StorageZoneTelemetry({ zones, selectedZoneId, onSelectZone }) {
+export default function StorageZoneTelemetry({ zones, selectedZoneId, onSelectZone, isDarkMode }) {
   const [historyData, setHistoryData] = useState([]);
   const [activeMetric, setActiveMetric] = useState('temperature');
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -31,24 +31,24 @@ export default function StorageZoneTelemetry({ zones, selectedZoneId, onSelectZo
   if (!selectedZone) return null;
 
   const metricConfigs = {
-    temperature: { label: "Temperature", unit: "°C", color: "#f43f5e", key: "temperature" },
-    humidity: { label: "Humidity", unit: "%", color: "#0ea5e9", key: "humidity" },
-    nh3: { label: "Ammonia (NH₃)", unit: "ppm", color: "#a855f7", key: "nh3" },
-    co2: { label: "Carbon Dioxide (CO₂)", unit: "ppm", color: "#10b981", key: "co2" },
-    voc: { label: "VOC Concentration", unit: "ppm", color: "#f59e0b", key: "voc" },
+    temperature: { label: "Temperature", unit: "°C", color: "#dc2626", key: "temperature" },
+    humidity: { label: "Humidity", unit: "%", color: "#0284c7", key: "humidity" },
+    nh3: { label: "Ammonia (NH₃)", unit: "ppm", color: "#7c3aed", key: "nh3" },
+    co2: { label: "Carbon Dioxide (CO₂)", unit: "ppm", color: "#059669", key: "co2" },
+    voc: { label: "VOC Concentration", unit: "ppm", color: "#d97706", key: "voc" },
   };
 
   return (
-    <div className="glass-panel p-6 rounded-2xl">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-800 pb-5">
+    <div className="glass-panel p-6 rounded-2xl space-y-5 bg-white border border-[#d1ded5]">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-[#e1eae4] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white">IoT Environmental Storage Telemetry</h2>
-            <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">IoT Environmental Storage Telemetry</h2>
+            <span className="text-xs px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
               ESP32 Sensor Array
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
             Continuous multi-sensor monitoring for early spoilage gases & thermal deviations
           </p>
         </div>
@@ -59,13 +59,13 @@ export default function StorageZoneTelemetry({ zones, selectedZoneId, onSelectZo
             <button
               key={z.id}
               onClick={() => onSelectZone(z.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
                 selectedZone.id === z.id
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                  : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 border border-slate-700/60'
+                  ? 'bg-emerald-700 text-white border-emerald-800 shadow-sm'
+                  : 'bg-white hover:bg-emerald-50 text-slate-700 border-[#d1ded5]'
               }`}
             >
-              <span className={`h-2 w-2 rounded-full ${z.status === 'optimal' ? 'bg-emerald-400' : 'bg-rose-400 animate-pulse'}`} />
+              <span className={`h-2.5 w-2.5 rounded-full ${z.status === 'optimal' ? 'bg-emerald-400' : 'bg-rose-500 animate-pulse'}`} />
               {z.name.split(':')[0]} ({z.category})
             </button>
           ))}
@@ -73,21 +73,21 @@ export default function StorageZoneTelemetry({ zones, selectedZoneId, onSelectZo
       </div>
 
       {/* Selected Zone Header */}
-      <div className="mt-5 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-800/80">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#f8faf9] p-4 rounded-xl border border-[#d1ded5]">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-white">{selectedZone.name}</h3>
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">{selectedZone.name}</h3>
             {selectedZone.status === 'optimal' ? (
-              <span className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                <CheckCircle className="h-3 w-3" /> Environment Optimal
+              <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-950 border border-emerald-300 font-bold">
+                <CheckCircle className="h-4 w-4 text-emerald-700" /> Environment Optimal
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium animate-pulse">
-                <AlertCircle className="h-3 w-3" /> Gas / Thermal Drift Detected
+              <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-rose-100 text-rose-950 border border-rose-300 font-bold animate-pulse">
+                <AlertCircle className="h-4 w-4 text-rose-700" /> Gas / Thermal Drift Detected
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">{selectedZone.description}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">{selectedZone.description}</p>
         </div>
       </div>
 
@@ -97,109 +97,126 @@ export default function StorageZoneTelemetry({ zones, selectedZoneId, onSelectZo
         {/* 1. Temp */}
         <div 
           onClick={() => setActiveMetric('temperature')}
-          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-            activeMetric === 'temperature' ? 'bg-rose-500/10 border-rose-500/50 shadow-md' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+          className={`p-4 rounded-xl border cursor-pointer transition-all ${
+            activeMetric === 'temperature'
+              ? 'bg-rose-50 border-rose-400 shadow-sm ring-1 ring-rose-300'
+              : 'bg-white border-[#d1ded5] hover:border-slate-400'
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><Thermometer className="h-3.5 w-3.5 text-rose-400" /> Temp</span>
-            <span className="text-[10px] text-slate-500">Target: {selectedZone.target_temp}°C</span>
+          <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
+            <span className="flex items-center gap-1.5 text-rose-700"><Thermometer className="h-4 w-4" /> Temp</span>
+            <span className="text-[10px] bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">Target: {selectedZone.target_temp}°C</span>
           </div>
-          <div className="text-2xl font-bold text-white mt-1.5">
-            {selectedZone.current_temp} <span className="text-sm font-normal text-slate-400">°C</span>
+          <div className="text-3xl font-black text-slate-900 mt-2">
+            {selectedZone.current_temp} <span className="text-base font-bold text-slate-500">°C</span>
           </div>
         </div>
 
         {/* 2. Humidity */}
         <div 
           onClick={() => setActiveMetric('humidity')}
-          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-            activeMetric === 'humidity' ? 'bg-sky-500/10 border-sky-500/50 shadow-md' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+          className={`p-4 rounded-xl border cursor-pointer transition-all ${
+            activeMetric === 'humidity'
+              ? 'bg-sky-50 border-sky-400 shadow-sm ring-1 ring-sky-300'
+              : 'bg-white border-[#d1ded5] hover:border-slate-400'
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><Droplets className="h-3.5 w-3.5 text-sky-400" /> Humidity</span>
-            <span className="text-[10px] text-slate-500">Target: {selectedZone.target_humidity}%</span>
+          <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
+            <span className="flex items-center gap-1.5 text-sky-700"><Droplets className="h-4 w-4" /> Humidity</span>
+            <span className="text-[10px] bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">Target: {selectedZone.target_humidity}%</span>
           </div>
-          <div className="text-2xl font-bold text-white mt-1.5">
-            {selectedZone.current_humidity} <span className="text-sm font-normal text-slate-400">%</span>
+          <div className="text-3xl font-black text-slate-900 mt-2">
+            {selectedZone.current_humidity} <span className="text-base font-bold text-slate-500">%</span>
           </div>
         </div>
 
         {/* 3. NH3 */}
         <div 
           onClick={() => setActiveMetric('nh3')}
-          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-            activeMetric === 'nh3' ? 'bg-purple-500/10 border-purple-500/50 shadow-md' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+          className={`p-4 rounded-xl border cursor-pointer transition-all ${
+            activeMetric === 'nh3'
+              ? 'bg-purple-50 border-purple-400 shadow-sm ring-1 ring-purple-300'
+              : 'bg-white border-[#d1ded5] hover:border-slate-400'
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><Wind className="h-3.5 w-3.5 text-purple-400" /> NH₃ Ammonia</span>
-            <span className={`text-[10px] font-bold ${selectedZone.nh3 > 0.2 ? 'text-rose-400' : 'text-emerald-400'}`}>
+          <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
+            <span className="flex items-center gap-1.5 text-purple-700"><Wind className="h-4 w-4" /> NH₃ Ammonia</span>
+            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${selectedZone.nh3 > 0.2 ? 'bg-rose-600 text-white border-rose-700' : 'bg-emerald-600 text-white border-emerald-700'}`}>
               {selectedZone.nh3 > 0.2 ? 'High' : 'Normal'}
             </span>
           </div>
-          <div className="text-2xl font-bold text-white mt-1.5">
-            {selectedZone.nh3} <span className="text-sm font-normal text-slate-400">ppm</span>
+          <div className="text-3xl font-black text-slate-900 mt-2">
+            {selectedZone.nh3} <span className="text-base font-bold text-slate-500">ppm</span>
           </div>
         </div>
 
         {/* 4. CO2 */}
         <div 
           onClick={() => setActiveMetric('co2')}
-          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-            activeMetric === 'co2' ? 'bg-emerald-500/10 border-emerald-500/50 shadow-md' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+          className={`p-4 rounded-xl border cursor-pointer transition-all ${
+            activeMetric === 'co2'
+              ? 'bg-emerald-50 border-emerald-400 shadow-sm ring-1 ring-emerald-300'
+              : 'bg-white border-[#d1ded5] hover:border-slate-400'
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><Activity className="h-3.5 w-3.5 text-emerald-400" /> CO₂ Level</span>
-            <span className="text-[10px] text-slate-500">Respiration</span>
+          <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
+            <span className="flex items-center gap-1.5 text-emerald-700"><Activity className="h-4 w-4" /> CO₂ Level</span>
+            <span className="text-[10px] bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">Respiration</span>
           </div>
-          <div className="text-2xl font-bold text-white mt-1.5">
-            {selectedZone.co2} <span className="text-sm font-normal text-slate-400">ppm</span>
+          <div className="text-3xl font-black text-slate-900 mt-2">
+            {selectedZone.co2} <span className="text-base font-bold text-slate-500">ppm</span>
           </div>
         </div>
 
         {/* 5. VOC */}
         <div 
           onClick={() => setActiveMetric('voc')}
-          className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-            activeMetric === 'voc' ? 'bg-amber-500/10 border-amber-500/50 shadow-md' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+          className={`p-4 rounded-xl border cursor-pointer transition-all ${
+            activeMetric === 'voc'
+              ? 'bg-amber-50 border-amber-400 shadow-sm ring-1 ring-amber-300'
+              : 'bg-white border-[#d1ded5] hover:border-slate-400'
           }`}
         >
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><Gauge className="h-3.5 w-3.5 text-amber-400" /> Total VOC</span>
-            <span className="text-[10px] text-slate-500">Degradation</span>
+          <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
+            <span className="flex items-center gap-1.5 text-amber-700"><Gauge className="h-4 w-4" /> Total VOC</span>
+            <span className="text-[10px] bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">Degradation</span>
           </div>
-          <div className="text-2xl font-bold text-white mt-1.5">
-            {selectedZone.voc} <span className="text-sm font-normal text-slate-400">ppm</span>
+          <div className="text-3xl font-black text-slate-900 mt-2">
+            {selectedZone.voc} <span className="text-base font-bold text-slate-500">ppm</span>
           </div>
         </div>
 
       </div>
 
       {/* 24-Hour Telemetry Trend Chart */}
-      <div className="mt-5 bg-slate-900/70 p-4 rounded-xl border border-slate-800">
+      <div className="bg-[#f8faf9] p-5 rounded-2xl border border-[#d1ded5] shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-slate-300">
+          <span className="text-xs font-bold text-slate-900">
             24-Hour Telemetry Trend: <span style={{ color: metricConfigs[activeMetric].color }}>{metricConfigs[activeMetric].label} ({metricConfigs[activeMetric].unit})</span>
           </span>
-          <span className="text-[11px] text-slate-400">Recorded via IoT node at 1h intervals</span>
+          <span className="text-[11px] text-slate-500 font-medium">Recorded via IoT node at 1h intervals</span>
         </div>
 
-        <div className="h-56 w-full">
+        <div className="h-60 w-full">
           {loadingHistory ? (
-            <div className="h-full flex items-center justify-center text-slate-500 text-xs">
+            <div className="h-full flex items-center justify-center text-slate-500 text-xs font-medium">
               Loading sensor time-series...
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={historyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="timestamp" stroke="#64748b" fontSize={11} />
                 <YAxis stroke="#64748b" fontSize={11} domain={['auto', 'auto']} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderColor: '#cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.08)'
+                  }}
                   itemStyle={{ color: metricConfigs[activeMetric].color }}
                   formatter={(val) => [`${val} ${metricConfigs[activeMetric].unit}`, metricConfigs[activeMetric].label]}
                 />
