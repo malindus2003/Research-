@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, AlertTriangle, ShieldAlert, CheckCircle2, ChevronRight, XCircle, ArrowRight, Check, ExternalLink, Clock } from 'lucide-react';
+import { Sparkles, AlertTriangle, ShieldAlert, CheckCircle2, ChevronRight, XCircle, ArrowRight, Check, ExternalLink, Clock, Package } from 'lucide-react';
 import axios from 'axios';
 
 export default function ActionRecommendations({ recommendations, onOpenAlertsCenter, onRefresh }) {
@@ -31,6 +31,7 @@ export default function ActionRecommendations({ recommendations, onOpenAlertsCen
           border: 'border-rose-300 dark:border-rose-700/60',
           bg: 'bg-rose-50/70 dark:bg-rose-950/20',
           badge: 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-700 font-bold',
+          itemBadge: 'bg-rose-100 dark:bg-rose-950/80 text-rose-950 dark:text-rose-200 border-rose-300 dark:border-rose-700',
           title: 'text-rose-950 dark:text-white',
           body: 'text-rose-900 dark:text-slate-300',
           actionText: 'text-rose-950 dark:text-rose-200',
@@ -41,6 +42,7 @@ export default function ActionRecommendations({ recommendations, onOpenAlertsCen
           border: 'border-amber-300 dark:border-amber-700/60',
           bg: 'bg-amber-50/70 dark:bg-amber-950/20',
           badge: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700 font-bold',
+          itemBadge: 'bg-amber-100 dark:bg-amber-950/80 text-amber-950 dark:text-amber-200 border-amber-300 dark:border-amber-700',
           title: 'text-amber-950 dark:text-white',
           body: 'text-amber-900 dark:text-slate-300',
           actionText: 'text-amber-950 dark:text-amber-200',
@@ -52,6 +54,7 @@ export default function ActionRecommendations({ recommendations, onOpenAlertsCen
           border: 'border-emerald-300 dark:border-emerald-700/60',
           bg: 'bg-emerald-50/70 dark:bg-emerald-950/20',
           badge: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700 font-bold',
+          itemBadge: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-950 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700',
           title: 'text-emerald-950 dark:text-white',
           body: 'text-emerald-900 dark:text-slate-300',
           actionText: 'text-emerald-950 dark:text-emerald-200',
@@ -102,7 +105,17 @@ export default function ActionRecommendations({ recommendations, onOpenAlertsCen
                   <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{rec.zone?.split(':')[0]}</span>
                 </div>
 
-                <h3 className={`text-sm font-bold mt-2.5 ${style.title}`}>{rec.title}</h3>
+                {/* PROMINENT ITEM NAME BADGE */}
+                {rec.item_name && (
+                  <div className="mt-2.5">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black border shadow-xs ${style.itemBadge}`}>
+                      <Package className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span>Item: {rec.item_name}</span>
+                    </span>
+                  </div>
+                )}
+
+                <h3 className={`text-sm font-bold mt-2 ${style.title}`}>{rec.title}</h3>
                 <p className={`text-xs mt-1 font-medium leading-relaxed ${style.body}`}>{rec.message}</p>
               </div>
 

@@ -18,7 +18,8 @@ import {
   CheckCheck,
   Volume2,
   VolumeX,
-  Clock
+  Clock,
+  Package
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -297,8 +298,18 @@ export default function AlertNotificationCenter({
                     </span>
                   </div>
 
+                  {/* PROMINENT ITEM NAME BADGE */}
+                  {alert.item_name && (
+                    <div className="pt-0.5">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 shadow-xs">
+                        <Package className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                        <span>Target Item: {alert.item_name}</span>
+                      </span>
+                    </div>
+                  )}
+
                   <div>
-                    <h4 className={`text-sm font-bold ${style.title}`}>{alert.title}</h4>
+                    <h4 className={`text-sm font-bold mt-1 ${style.title}`}>{alert.title}</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 font-medium leading-relaxed">
                       {alert.message}
                     </p>
