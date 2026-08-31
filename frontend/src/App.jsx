@@ -13,7 +13,8 @@ import DemandForecastingDashboard from './components/DemandForecastingDashboard'
 import KitchenStaffDashboard from './components/KitchenStaffDashboard';
 import SmartWasteBinDashboard from './components/SmartWasteBinDashboard';
 import CentralExecutiveDashboard from './components/CentralExecutiveDashboard';
-import { Activity, LayoutDashboard, Camera, Cpu, ListFilter, AlertTriangle, Sparkles, X, TrendingUp, Users, Trash2, Layers, Check } from 'lucide-react';
+import OrderManagementDashboard from './components/OrderManagementDashboard';
+import { Activity, LayoutDashboard, Camera, Cpu, ListFilter, AlertTriangle, Sparkles, X, TrendingUp, Users, Trash2, Layers, Check, ShoppingBag, Package, Truck, ShieldCheck, DollarSign } from 'lucide-react';
 
 export default function App() {
   const [stats, setStats] = useState(null);
@@ -25,8 +26,8 @@ export default function App() {
   // Theme state: defaults to false (Light Mode) for bright, clear visibility
   const [isDarkMode, setIsDarkMode] = useState(false);
   
-  // Top Level Navigation Module: 'executive', 'demand', 'kitchen', 'spoilage', 'waste'
-  const [activeModule, setActiveModule] = useState('spoilage');
+  // Top Level Navigation Module: 'executive', 'orders', 'inventory', 'spoilage', 'kitchen', 'demand', 'waste'
+  const [activeModule, setActiveModule] = useState('orders');
   
   // Spoilage Sub-Tabs: 'vision', 'assessor', 'inventory', 'sensors', 'simulator'
   const [spoilageSubTab, setSpoilageSubTab] = useState('vision');
@@ -127,14 +128,79 @@ export default function App() {
           />
         )}
 
-        {/* Module 2: Demand Prediction */}
-        {activeModule === 'demand' && (
-          <DemandForecastingDashboard isDarkMode={isDarkMode} />
+        {/* Module 2: Order Management & Live POS */}
+        {activeModule === 'orders' && (
+          <OrderManagementDashboard
+            onRefresh={fetchAllData}
+            isDarkMode={isDarkMode}
+          />
         )}
 
-        {/* Module 3: Kitchen & Staff */}
-        {activeModule === 'kitchen' && (
-          <KitchenStaffDashboard isDarkMode={isDarkMode} />
+        {/* Module 3: Dedicated Inventory & Stock Management */}
+        {activeModule === 'inventory' && (
+          <div className="space-y-6">
+            
+            {/* Inventory Overview Summary Banner */}
+            <div className="glass-panel p-6 rounded-2xl relative overflow-hidden bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800 shadow-sm space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 flex items-center gap-1.5 shadow-sm">
+                      <Package className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400" /> Perishable Inventory & Cold Storage
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">• Smart FIFO Auto-Prioritization</span>
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-2">
+                    Perishable Inventory & Stock Valuation Matrix
+                  </h2>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 font-medium max-w-2xl leading-relaxed">
+                    Continuous monitoring of perishable food batches across 5 temperature-controlled chambers (Fruits, Veg, Dairy, Fish, Meat) with automated Smart FIFO consumption for orders.
+                  </p>
+                </div>
+              </div>
+
+              {/* Inventory Metric Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#e1eae4] dark:border-slate-800">
+                <div className="p-3.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/80 border border-[#d1ded5] dark:border-slate-700">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Total Active Batches</span>
+                  <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{inventoryItems.length}</div>
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">Monitored 24/7 across 5 chambers</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/80 border border-[#d1ded5] dark:border-slate-700">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Smart FIFO Targets (Low RSL)</span>
+                  <div className="text-2xl font-black text-amber-700 dark:text-amber-400 mt-0.5">
+                    {inventoryItems.filter(i => i.is_smart_fifo_target || i.risk_level === 'High').length}
+                  </div>
+                  <span className="text-[10px] text-amber-800 dark:text-amber-400 font-medium">Prioritized for incoming kitchen orders</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/80 border border-[#d1ded5] dark:border-slate-700">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Critical Quarantine Batches</span>
+                  <div className="text-2xl font-black text-rose-700 dark:text-rose-400 mt-0.5">
+                    {inventoryItems.filter(i => i.risk_level === 'Critical').length}
+                  </div>
+                  <span className="text-[10px] text-rose-800 dark:text-rose-400 font-medium">Locked / Cannot be used in recipes</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/80 border border-[#d1ded5] dark:border-slate-700">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Estimated Stock Valuation</span>
+                  <div className="text-2xl font-black text-emerald-800 dark:text-emerald-400 mt-0.5">
+                    Rs. {inventoryItems.reduce((acc, it) => acc + (it.stock_valuation_lkr || 4500), 0).toLocaleString()}
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Live inventory asset worth</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Inventory Health Matrix Table */}
+            <InventoryHealthTable
+              items={inventoryItems}
+              zones={zones}
+              onRefresh={fetchAllData}
+              isDarkMode={isDarkMode}
+            />
+          </div>
         )}
 
         {/* Module 4: Food Spoilage & Quality Assessment */}
@@ -183,17 +249,6 @@ export default function App() {
                   }`}
                 >
                   <Activity className="h-3.5 w-3.5" /> IoT Telemetry
-                </button>
-
-                <button
-                  onClick={() => setSpoilageSubTab('inventory')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    spoilageSubTab === 'inventory'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700'
-                  }`}
-                >
-                  <ListFilter className="h-3.5 w-3.5" /> Batch Matrix
                 </button>
 
                 <button
@@ -254,18 +309,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Sub-View: Batch Health Matrix Table */}
-            {spoilageSubTab === 'inventory' && (
-              <div className="space-y-6">
-                <InventoryHealthTable
-                  items={inventoryItems}
-                  zones={zones}
-                  onRefresh={fetchAllData}
-                  isDarkMode={isDarkMode}
-                />
-              </div>
-            )}
-
             {/* Sub-View: ESP32 Hardware Simulator */}
             {spoilageSubTab === 'simulator' && (
               <div className="space-y-6">
@@ -280,7 +323,17 @@ export default function App() {
           </div>
         )}
 
-        {/* Module 5: Smart Waste Bin */}
+        {/* Module 5: Kitchen & Staff */}
+        {activeModule === 'kitchen' && (
+          <KitchenStaffDashboard isDarkMode={isDarkMode} />
+        )}
+
+        {/* Module 6: Demand Prediction */}
+        {activeModule === 'demand' && (
+          <DemandForecastingDashboard isDarkMode={isDarkMode} />
+        )}
+
+        {/* Module 7: Smart Waste Bin */}
         {activeModule === 'waste' && (
           <SmartWasteBinDashboard isDarkMode={isDarkMode} />
         )}

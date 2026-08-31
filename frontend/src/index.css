@@ -29,6 +29,15 @@
   background: #64748b;
 }
 
+/* Hide scrollbar for clean navigation bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Clean Food Freshness Theme Panel */
 .glass-panel {
   background: #ffffff;

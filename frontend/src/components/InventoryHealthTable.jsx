@@ -1,5 +1,27 @@
 import React, { useState } from 'react';
-import { Package, Search, Filter, Plus, Trash2, ArrowUpRight, CheckCircle2, AlertTriangle, ShieldAlert, XCircle, Apple, Carrot, Milk, Fish, Beef, X } from 'lucide-react';
+import { 
+  Package, 
+  Search, 
+  Filter, 
+  Plus, 
+  Trash2, 
+  ArrowUpRight, 
+  CheckCircle2, 
+  AlertTriangle, 
+  ShieldAlert, 
+  XCircle, 
+  Apple, 
+  Carrot, 
+  Milk, 
+  Fish, 
+  Beef, 
+  X, 
+  Truck, 
+  Layers, 
+  DollarSign, 
+  Sparkles,
+  PackageCheck
+} from 'lucide-react';
 import axios from 'axios';
 
 export default function InventoryHealthTable({ items, zones, onRefresh }) {
@@ -7,6 +29,7 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedRisk, setSelectedRisk] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showRestockModal, setShowRestockModal] = useState(false);
 
   // New batch form state
   const [newItem, setNewItem] = useState({
@@ -14,8 +37,17 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
     category: "Fruits",
     storage_zone: zones[0]?.name || "Zone 1: Fruit & Berry Preservation Chamber",
     batch_number: "",
-    quantity: "10 kg",
+    quantity: "15.0 kg",
     storage_duration_hours: 24
+  });
+
+  // Quick Restock form state
+  const [restockData, setRestockData] = useState({
+    name: "Cavendish Ripe Bananas (Crate)",
+    category: "Fruits",
+    storage_zone: zones[0]?.name || "Zone 1: Fruit & Berry Preservation Chamber",
+    quantity_kg: 25.0,
+    supplier: "Ceylon Organic Agricoop"
   });
 
   const filteredItems = items.filter(item => {
@@ -45,12 +77,23 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
         category: "Fruits",
         storage_zone: zones[0]?.name || "Zone 1: Fruit & Berry Preservation Chamber",
         batch_number: "",
-        quantity: "10 kg",
+        quantity: "15.0 kg",
         storage_duration_hours: 24
       });
       onRefresh();
     } catch (err) {
       console.error("Failed to add inventory item:", err);
+    }
+  };
+
+  const handleRestockShipment = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:8000/api/inventory/restock", restockData);
+      setShowRestockModal(false);
+      onRefresh();
+    } catch (err) {
+      console.error("Failed to restock shipment:", err);
     }
   };
 
@@ -86,25 +129,35 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
 
   return (
     <div className="glass-panel p-6 rounded-2xl space-y-5 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
+      
+      {/* Header with Stock Ingestion & Restock Triggers */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e1eae4] dark:border-slate-800 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Perishable Inventory Spoilage Matrix</h2>
+            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Perishable Inventory Spoilage & Stock Matrix</h2>
             <span className="text-xs px-2.5 py-1 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold">
-              {filteredItems.length} Batches (All 5 Categories)
+              {filteredItems.length} Monitored Batches
             </span>
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
-            Real-time batch-level shelf-life tracking for Fruits, Vegetables, Dairy, Fish & Meat
+            Real-time batch shelf-life tracking, automated order deductions, and Smart FIFO dispatch priority
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-700/20 transition-colors"
-        >
-          <Plus className="h-4 w-4" /> Register New Batch
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowRestockModal(true)}
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 transition-colors"
+          >
+            <Truck className="h-4 w-4 text-emerald-700 dark:text-emerald-400" /> Receive Shipment
+          </button>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-700/20 transition-colors"
+          >
+            <Plus className="h-4 w-4" /> Register New Batch
+          </button>
+        </div>
       </div>
 
       {/* Category Pills + Search Toolbar */}
@@ -114,7 +167,7 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500 dark:text-slate-400" />
           <input
             type="text"
-            placeholder="Search fruit, veg, meat or batch..."
+            placeholder="Search fruit, veg, meat or batch code..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-white dark:bg-slate-900 border border-[#c6d7cd] dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white font-medium placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-600 shadow-sm"
@@ -154,16 +207,16 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
         </div>
       </div>
 
-      {/* Table Data */}
+      {/* Table Data with FIFO & Stock Valuation */}
       <div className="overflow-x-auto rounded-xl border border-[#d1ded5] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         <table className="w-full text-left text-xs text-slate-900 dark:text-slate-100">
           <thead className="bg-[#f0f5f2] dark:bg-slate-800 text-slate-800 dark:text-slate-200 uppercase font-bold border-b border-[#d1ded5] dark:border-slate-800">
             <tr>
-              <th className="py-3 px-4">Item & Batch</th>
-              <th className="py-3 px-4">Category & Zone</th>
-              <th className="py-3 px-4">Sensory Telemetry</th>
+              <th className="py-3 px-4">Item & Batch Code</th>
+              <th className="py-3 px-4">Category & Chamber</th>
+              <th className="py-3 px-4">Stock Qty & Value</th>
               <th className="py-3 px-4">Remaining Shelf-Life</th>
-              <th className="py-3 px-4">Risk Level</th>
+              <th className="py-3 px-4">Risk & FIFO Routing</th>
               <th className="py-3 px-4">Action Recommendation</th>
               <th className="py-3 px-4 text-right">Actions</th>
             </tr>
@@ -178,40 +231,61 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
             ) : (
               filteredItems.map((item) => (
                 <tr key={item.id} className="hover:bg-[#f9fbf9] dark:hover:bg-slate-800/60 transition-colors">
+                  
+                  {/* Item Name & Code */}
                   <td className="py-3.5 px-4">
-                    <div className="font-bold text-slate-900 dark:text-white">{item.name}</div>
+                    <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <span>{item.name}</span>
+                      {item.is_smart_fifo_target && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                          Smart FIFO Target
+                        </span>
+                      )}
+                    </div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono font-medium mt-0.5">
-                      {item.batch_number} • <span className="font-bold text-slate-700 dark:text-slate-300">{item.quantity}</span>
+                      {item.batch_number} • <span className="text-slate-400">Stored {item.storage_duration_hours}h ago</span>
                     </div>
                   </td>
+
+                  {/* Category & Zone */}
                   <td className="py-3.5 px-4">
                     <div>{getCategoryBadge(item.category)}</div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">{item.storage_zone.split(':')[0]}</div>
                   </td>
+
+                  {/* Stock Quantity & Unit Valuation */}
                   <td className="py-3.5 px-4">
-                    <div className="text-xs font-mono font-bold text-slate-900 dark:text-white">
-                      <span>{item.current_temp}°C</span> • <span>{item.current_humidity}% RH</span>
+                    <div className="text-xs font-bold text-slate-900 dark:text-white">
+                      {item.quantity}
                     </div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                      CO₂: {item.current_co2} ppm • VOC: {item.current_voc} ppm
+                    <div className="text-[10px] text-emerald-800 dark:text-emerald-400 font-mono font-semibold mt-0.5">
+                      ~Rs. {item.stock_valuation_lkr ? item.stock_valuation_lkr.toLocaleString() : '4,500'}
                     </div>
                   </td>
+
+                  {/* Remaining Shelf Life */}
                   <td className="py-3.5 px-4">
-                    <div className={`text-sm font-bold ${item.remaining_shelf_life_hours < 12 ? 'text-rose-700 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                    <div className={`text-sm font-black ${item.remaining_shelf_life_hours < 16 ? 'text-rose-700 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                       {item.remaining_shelf_life_hours} hrs
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                       Spoilage Prob: {item.spoilage_prob}%
                     </div>
                   </td>
+
+                  {/* Risk Badge */}
                   <td className="py-3.5 px-4">
                     {renderRiskBadge(item.risk_level)}
                   </td>
+
+                  {/* Culinary Recommendation */}
                   <td className="py-3.5 px-4 max-w-xs">
                     <span className="text-xs text-slate-700 dark:text-slate-300 font-medium line-clamp-2">
                       {item.recommendation}
                     </span>
                   </td>
+
+                  {/* Actions */}
                   <td className="py-3.5 px-4 text-right">
                     <button
                       onClick={() => handleDeleteItem(item.id)}
@@ -228,7 +302,109 @@ export default function InventoryHealthTable({ items, zones, onRefresh }) {
         </table>
       </div>
 
-      {/* Add New Batch Modal */}
+      {/* QUICK RESTOCK / RECEIVE SHIPMENT MODAL */}
+      {showRestockModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#e1eae4] dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-emerald-700 dark:text-emerald-400" />
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Receive Supplier Shipment</h3>
+              </div>
+              <button
+                onClick={() => setShowRestockModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleRestockShipment} className="space-y-3 text-xs">
+              <div>
+                <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Item / Produce Name</label>
+                <input
+                  type="text"
+                  required
+                  value={restockData.name}
+                  onChange={(e) => setRestockData({ ...restockData, name: e.target.value })}
+                  className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Category</label>
+                  <select
+                    value={restockData.category}
+                    onChange={(e) => setRestockData({ ...restockData, category: e.target.value })}
+                    className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="Fruits">Fruits</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Fish">Fish & Seafood</option>
+                    <option value="Meat">Meat & Poultry</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Quantity (kg)</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="1"
+                    required
+                    value={restockData.quantity_kg}
+                    onChange={(e) => setRestockData({ ...restockData, quantity_kg: Number(e.target.value) })}
+                    className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-emerald-600"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Destination Cold Storage Chamber</label>
+                <select
+                  value={restockData.storage_zone}
+                  onChange={(e) => setRestockData({ ...restockData, storage_zone: e.target.value })}
+                  className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-600"
+                >
+                  {zones.map(z => (
+                    <option key={z.id} value={z.name}>{z.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Approved Agricultural Supplier</label>
+                <input
+                  type="text"
+                  value={restockData.supplier}
+                  onChange={(e) => setRestockData({ ...restockData, supplier: e.target.value })}
+                  className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#e1eae4] dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowRestockModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-md shadow-emerald-700/20"
+                >
+                  Confirm Shipment Receipt
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* REGISTER NEW BATCH MODAL */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
