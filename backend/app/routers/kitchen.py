@@ -14,7 +14,7 @@ KITCHEN_STATIONS = [
         "queue_length": 14,
         "load_level": 92,
         "bottleneck_status": "High Delay Risk",
-        "action": "Allocate 1 auxiliary chef from Cold Larder station immediately"
+        "action": "Reallocate S. Fernando from Salad & Cold Prep Station to Hot Wok & Kottu Station based on skill matching (Enrolled in 'High-Volume Stir-Fry Optimization')"
     },
     {
         "id": "station-2",
@@ -38,7 +38,7 @@ KITCHEN_STATIONS = [
         "queue_length": 9,
         "load_level": 84,
         "bottleneck_status": "Moderate Bottleneck",
-        "action": "Prep protein cuts in advance to reduce grilling latency"
+        "action": "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching (Seafood Freshness Grading & Quick-Sear Techniques)"
     },
     {
         "id": "station-4",
@@ -50,7 +50,7 @@ KITCHEN_STATIONS = [
         "queue_length": 2,
         "load_level": 30,
         "bottleneck_status": "Underutilized",
-        "action": "Reassign 1 staff member to Kottu Station during 7 PM rush"
+        "action": "Reassign S. Fernando to Hot Wok & Kottu Station during 7 PM rush based on skill matching"
     }
 ]
 
@@ -90,10 +90,50 @@ STAFF_MEMBERS = [
         "skill_gap": "HACCP Seafood Core Temperature Monitoring",
         "training_recommendation": "Seafood Freshness Grading & Quick-Sear Techniques",
         "career_progression": "Grill Master Track (74% Completed)"
+    },
+    {
+        "id": "staff-4",
+        "name": "A. Jayasinghe (Station Lead)",
+        "assigned_station": "Curry & Rice Assembly Bay",
+        "shift": "07:00 AM - 04:00 PM",
+        "efficiency_rating": 91,
+        "skill_level": "Expert (Level 4)",
+        "speed_score": "4.7 / 5.0",
+        "skill_gap": "High-Volume Batch Inventory Planning",
+        "training_recommendation": "Mastering Sri Lankan Spice Ratios & Fast Assembly Lines",
+        "career_progression": "Head of Curry Bay Track (82% Completed)"
+    },
+    {
+        "id": "staff-5",
+        "name": "M. Wickramasinghe (Kitchen Trainee)",
+        "assigned_station": "Salad & Cold Prep Station",
+        "shift": "11:00 AM - 08:00 PM",
+        "efficiency_rating": 64,
+        "skill_level": "Trainee (Level 1)",
+        "speed_score": "3.1 / 5.0",
+        "skill_gap": "Knife Handling, Prep Hygiene & Portion Control",
+        "training_recommendation": "Foundation Kitchen Safety, Knife Skills & Hygiene Protocols",
+        "career_progression": "Apprentice Onboarding (35% Completed)"
+    },
+    {
+        "id": "staff-6",
+        "name": "R. Dissanayake (Kitchen Trainee)",
+        "assigned_station": "Hot Wok & Assembly Support",
+        "shift": "01:00 PM - 10:00 PM",
+        "efficiency_rating": 58,
+        "skill_level": "Trainee (Level 1)",
+        "speed_score": "2.8 / 5.0",
+        "skill_gap": "Station Setup & Order Ticket Flow",
+        "training_recommendation": "Basic Line Cooking Fundamentals & Ticket Dispatching",
+        "career_progression": "Junior Line Apprentice (25% Completed)"
     }
 ]
 
 PEAK_HOURS_DATA = [
+    {"hour": "07:00", "predicted_orders": 28, "staff_required": 4, "actual_staff": 4},
+    {"hour": "08:00 (Breakfast Peak)", "predicted_orders": 76, "staff_required": 6, "actual_staff": 6},
+    {"hour": "09:00", "predicted_orders": 58, "staff_required": 5, "actual_staff": 5},
+    {"hour": "10:00", "predicted_orders": 32, "staff_required": 4, "actual_staff": 4},
     {"hour": "11:00", "predicted_orders": 24, "staff_required": 4, "actual_staff": 4},
     {"hour": "12:00", "predicted_orders": 68, "staff_required": 7, "actual_staff": 6},
     {"hour": "13:00 (Lunch Peak)", "predicted_orders": 95, "staff_required": 8, "actual_staff": 8},

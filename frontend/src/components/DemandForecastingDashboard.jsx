@@ -127,6 +127,8 @@ export default function DemandForecastingDashboard({ isDarkMode }) {
             </div>
           </div>
         </div>
+
+
       </div>
 
       {/* Multi-Day Demand Trend Chart */}
