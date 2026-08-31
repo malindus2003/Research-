@@ -104,6 +104,24 @@ MENU_ITEMS = [
     }
 ]
 
+# --- RESTAURANT DINE-IN TABLES FLOOR STATE ---
+INITIAL_TABLES = [
+    {"table_no": "Table 01", "capacity": 2, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 02", "capacity": 4, "status": "dining", "current_order_id": "ORD-1080", "occupied_since": (datetime.now() - timedelta(minutes=35)).strftime("%H:%M")},
+    {"table_no": "Table 03", "capacity": 2, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 04", "capacity": 4, "status": "in_prep", "current_order_id": "ORD-1081", "occupied_since": (datetime.now() - timedelta(minutes=6)).strftime("%H:%M")},
+    {"table_no": "Table 05", "capacity": 6, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 06", "capacity": 4, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 07", "capacity": 2, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 08", "capacity": 8, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 09", "capacity": 4, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 10", "capacity": 2, "status": "available", "current_order_id": None, "occupied_since": None},
+    {"table_no": "Table 11", "capacity": 4, "status": "in_prep", "current_order_id": "ORD-1082", "occupied_since": (datetime.now() - timedelta(minutes=10)).strftime("%H:%M")},
+    {"table_no": "Table 12", "capacity": 6, "status": "available", "current_order_id": None, "occupied_since": None}
+]
+
+tables_db = list(INITIAL_TABLES)
+
 # --- IN-MEMORY ACTIVE ORDERS DATABASE ---
 INITIAL_ORDERS = [
     {
@@ -117,6 +135,7 @@ INITIAL_ORDERS = [
         ],
         "total_amount_lkr": 3750.0,
         "status": "in_prep",
+        "table_status": "occupied",
         "station_id": "station-1",
         "station_name": "Hot Wok & Kottu Station",
         "created_at": (datetime.now() - timedelta(minutes=6)).strftime("%H:%M:%S"),
@@ -140,6 +159,7 @@ INITIAL_ORDERS = [
         ],
         "total_amount_lkr": 3830.0,
         "status": "in_prep",
+        "table_status": "occupied",
         "station_id": "station-3",
         "station_name": "Grill & Seafood Station",
         "created_at": (datetime.now() - timedelta(minutes=10)).strftime("%H:%M:%S"),
@@ -161,6 +181,7 @@ INITIAL_ORDERS = [
         ],
         "total_amount_lkr": 2300.0,
         "status": "ready",
+        "table_status": "not_applicable",
         "station_id": "station-1",
         "station_name": "Hot Wok & Kottu Station",
         "created_at": (datetime.now() - timedelta(minutes=18)).strftime("%H:%M:%S"),
@@ -182,6 +203,7 @@ INITIAL_ORDERS = [
         ],
         "total_amount_lkr": 3200.0,
         "status": "completed",
+        "table_status": "dining",
         "station_id": "station-3",
         "station_name": "Grill & Seafood Station",
         "created_at": (datetime.now() - timedelta(minutes=35)).strftime("%H:%M:%S"),
@@ -190,7 +212,7 @@ INITIAL_ORDERS = [
         "ingredients_deducted": [
             {"item": "Prime Beef Sirloin (Vac-Pack)", "amount_kg": 0.35, "batch": "BAT-2026-BF09"}
         ],
-        "customer_note": "Served and paid."
+        "customer_note": "Served. Customers currently dining."
     }
 ]
 
@@ -212,16 +234,44 @@ class UpdateOrderStatusPayload(BaseModel):
 
 # --- ROUTER ENDPOINTS ---
 
+@router.get("/tables")
+def get_tables_floor_map():
+    """Retrieve live status of all dine-in restaurant tables (Available, Cooking, Dining/Occupied)."""
+    available_count = sum(1 for t in tables_db if t["status"] == "available")
+    occupied_count = len(tables_db) - available_count
+    return {
+        "tables": tables_db,
+        "total_tables": len(tables_db),
+        "available_tables": available_count,
+        "occupied_tables": occupied_count
+    }
+
+@router.post("/tables/{table_no}/free")
+def free_table(table_no: str):
+    """Mark a table as cleared, sanitized, and ready for new arriving guests."""
+    table = next((t for t in tables_db if t["table_no"].lower() == table_no.lower()), None)
+    if not table:
+        raise HTTPException(status_code=404, detail="Table not found")
+    
+    table["status"] = "available"
+    table["current_order_id"] = None
+    table["occupied_since"] = None
+
+    # Mark corresponding order's table status as cleared
+    for ord in orders_db:
+        if ord.get("table_no", "").lower() == table_no.lower() and ord.get("table_status") == "dining":
+            ord["table_status"] = "cleared"
+
+    return {"status": "success", "message": f"{table_no} is now cleared & free!", "table": table}
+
 @router.get("/menu")
 def get_menu_catalog():
     """Retrieve full restaurant menu with BOM recipes and real-time inventory availability."""
     enriched_menu = []
     for item in MENU_ITEMS:
-        # Check stock availability
         can_prepare = True
         stock_details = []
         for bom in item["recipe_bom"]:
-            # Find matching inventory item
             match = next((inv for inv in inventory_db if bom["ingredient_name"].lower() in inv["name"].lower() or bom["category"].lower() == inv["category"].lower()), None)
             if match:
                 qty_str = match.get("quantity", "0 kg").replace(" kg", "").replace(" L", "")
@@ -275,7 +325,7 @@ def place_new_order(payload: CreateOrderPayload):
     1. Validates recipe ingredients.
     2. Uses Smart FIFO to deduct required ingredient weights from batches with lowest Remaining Shelf-Life.
     3. Dispatches order ticket to designated Kitchen Station.
-    4. Records revenue and updates demand variance.
+    4. Occupies the designated table on the floor map.
     """
     if not payload.items:
         raise HTTPException(status_code=400, detail="Order must contain at least 1 item")
@@ -312,13 +362,11 @@ def place_new_order(payload: CreateOrderPayload):
         # Smart FIFO Ingredient Deduction from Inventory
         for bom in menu_item["recipe_bom"]:
             total_req = bom["required_kg"] * qty
-            # Find batches in inventory for this ingredient/category sorted by lowest Remaining Shelf Life
             candidates = [
                 inv for inv in inventory_db 
                 if (bom["ingredient_name"].lower() in inv["name"].lower() or bom["category"].lower() == inv["category"].lower())
                 and inv.get("risk_level") != "Critical"
             ]
-            # Sort by RSL (ascending) to consume expiring batches first (Smart FIFO)
             candidates.sort(key=lambda x: x.get("remaining_shelf_life_hours", 999.0))
 
             if candidates:
@@ -352,6 +400,7 @@ def place_new_order(payload: CreateOrderPayload):
         "items": order_items,
         "total_amount_lkr": round(total_amount, 2),
         "status": "pending",
+        "table_status": "occupied" if payload.order_type == "Dine-In" else "not_applicable",
         "station_id": primary_station_id,
         "station_name": primary_station_name,
         "created_at": datetime.now().strftime("%H:%M:%S"),
@@ -361,8 +410,16 @@ def place_new_order(payload: CreateOrderPayload):
         "customer_note": payload.customer_note or "Standard prep"
     }
 
+    # Mark table as occupied in floor map
+    if payload.order_type == "Dine-In":
+        table = next((t for t in tables_db if t["table_no"].lower() == payload.table_no.lower()), None)
+        if table:
+            table["status"] = "in_prep"
+            table["current_order_id"] = order_id
+            table["occupied_since"] = datetime.now().strftime("%H:%M")
+
     orders_db.insert(0, new_order)
-    return {"status": "success", "order": new_order, "message": f"Order {order_id} placed and routed to {primary_station_name}"}
+    return {"status": "success", "order": new_order, "message": f"Order {order_id} placed on {payload.table_no}"}
 
 
 @router.patch("/{order_id}/status")
@@ -375,19 +432,31 @@ def update_order_status(order_id: str, payload: UpdateOrderStatusPayload):
     order["status"] = payload.status
     if payload.status == "completed":
         order["completed_at"] = datetime.now().strftime("%H:%M:%S")
+        if order.get("order_type") == "Dine-In":
+            order["table_status"] = "dining"
+            # Update table to dining
+            table = next((t for t in tables_db if t["table_no"].lower() == order.get("table_no", "").lower()), None)
+            if table:
+                table["status"] = "dining"
+    elif payload.status == "in_prep":
+        table = next((t for t in tables_db if t["table_no"].lower() == order.get("table_no", "").lower()), None)
+        if table:
+            table["status"] = "in_prep"
     
     return {"status": "success", "order": order}
 
 
 @router.get("/stats")
 def get_order_stats():
-    """Retrieve operational metrics for Executive Hub and KDS."""
+    """Retrieve operational metrics for Executive Hub, Tables, and KDS."""
     total_orders = len(orders_db) + 412
     active_orders = [o for o in orders_db if o["status"] in ["pending", "in_prep"]]
     in_prep = [o for o in orders_db if o["status"] == "in_prep"]
     ready = [o for o in orders_db if o["status"] == "ready"]
     completed = [o for o in orders_db if o["status"] == "completed"]
     
+    available_tables = sum(1 for t in tables_db if t["status"] == "available")
+    dining_tables = sum(1 for t in tables_db if t["status"] == "dining")
     total_revenue_lkr = sum(o["total_amount_lkr"] for o in orders_db) + 482000.0
 
     return {
@@ -396,6 +465,8 @@ def get_order_stats():
         "in_prep_count": len(in_prep),
         "ready_for_pickup": len(ready),
         "completed_count": len(completed),
+        "available_tables_count": available_tables,
+        "dining_tables_count": dining_tables,
         "total_revenue_lkr": total_revenue_lkr,
         "avg_prep_time_mins": 7.8,
         "on_time_fulfillment_rate": "94.2%"

@@ -18,13 +18,17 @@ import {
   TrendingUp, 
   AlertCircle,
   ShieldCheck,
-  PackageCheck
+  PackageCheck,
+  Armchair,
+  CheckCheck,
+  Users
 } from 'lucide-react';
 import axios from 'axios';
 
 export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
   const [menu, setMenu] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [tables, setTables] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -32,7 +36,7 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
 
   // New Order State
   const [selectedDish, setSelectedDish] = useState(null);
-  const [tableNumber, setTableNumber] = useState("Table 05");
+  const [tableNumber, setTableNumber] = useState("Table 01");
   const [orderType, setOrderType] = useState("Dine-In");
   const [portionCount, setPortionCount] = useState(1);
   const [customerNote, setCustomerNote] = useState("");
@@ -46,14 +50,16 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
   const fetchOrderData = async () => {
     try {
       setLoading(true);
-      const [menuRes, ordersRes, statsRes] = await Promise.all([
+      const [menuRes, ordersRes, statsRes, tablesRes] = await Promise.all([
         axios.get("http://localhost:8000/api/orders/menu"),
         axios.get("http://localhost:8000/api/orders"),
-        axios.get("http://localhost:8000/api/orders/stats")
+        axios.get("http://localhost:8000/api/orders/stats"),
+        axios.get("http://localhost:8000/api/orders/tables")
       ]);
       setMenu(menuRes.data.menu);
       setOrders(ordersRes.data.orders);
       setStats(statsRes.data);
+      setTables(tablesRes.data.tables || []);
     } catch (err) {
       console.error("Failed to load order management data:", err);
     } finally {
@@ -68,7 +74,7 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
     try {
       setSubmittingOrder(true);
       const payload = {
-        table_no: tableNumber,
+        table_no: orderType === 'Dine-In' ? tableNumber : `${orderType} #${Math.floor(10 + Math.random() * 90)}`,
         order_type: orderType,
         items: [
           { menu_id: selectedDish.id, quantity: Number(portionCount) }
@@ -77,7 +83,7 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
       };
 
       const res = await axios.post("http://localhost:8000/api/orders", payload);
-      setOrderSuccessMessage(`Order #${res.data.order.order_number} successfully placed! Ingredients deducted via Smart FIFO.`);
+      setOrderSuccessMessage(`Order #${res.data.order.order_number} placed for ${res.data.order.table_no}! Smart FIFO ingredients deducted.`);
       setShowNewOrderModal(false);
       setSelectedDish(null);
       setCustomerNote("");
@@ -104,6 +110,18 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
     }
   };
 
+  const handleFreeTable = async (tableNo) => {
+    try {
+      await axios.post(`http://localhost:8000/api/orders/tables/${encodeURIComponent(tableNo)}/free`);
+      setOrderSuccessMessage(`${tableNo} is now cleared, sanitized & free for new arriving guests!`);
+      await fetchOrderData();
+      if (onRefresh) onRefresh();
+      setTimeout(() => setOrderSuccessMessage(null), 5000);
+    } catch (err) {
+      console.error("Failed to free table:", err);
+    }
+  };
+
   const filteredMenu = selectedCategory === "all"
     ? menu
     : menu.filter(m => m.category.toLowerCase().includes(selectedCategory.toLowerCase()));
@@ -112,6 +130,8 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
   const inPrepOrders = orders.filter(o => o.status === 'in_prep');
   const readyOrders = orders.filter(o => o.status === 'ready');
   const completedOrders = orders.filter(o => o.status === 'completed');
+
+  const availableTables = tables.filter(t => t.status === 'available');
 
   return (
     <div className="space-y-6">
@@ -124,13 +144,13 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 flex items-center gap-1.5 shadow-sm">
                 <ShoppingBag className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400" /> Integrated Order & POS Engine
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">• Smart FIFO Auto-Depletion</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">• Table Status & FIFO Depletion</span>
             </div>
             <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-2">
-              Live Order Stream & Kitchen Ticket Routing
+              Live Order Stream & Restaurant Table Floor Map
             </h2>
             <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 font-medium max-w-2xl leading-relaxed">
-              Every dish ordered automatically resolves its Bill of Materials (BOM) against cold storage inventory, prioritizes batches nearing expiration, and routes tickets dynamically to kitchen stations.
+              Every dish ordered deducts raw batches from cold storage, routes KDS tickets to kitchen stations, and monitors table dining occupancy until customers depart.
             </p>
           </div>
 
@@ -147,7 +167,7 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
             <button
               onClick={fetchOrderData}
               className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors border border-slate-300 dark:border-slate-700"
-              title="Refresh Orders"
+              title="Refresh Orders & Tables"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -164,15 +184,19 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
             </div>
 
             <div className="p-3.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/80 border border-[#d1ded5] dark:border-slate-700">
-              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Active In-Kitchen Tickets</span>
-              <div className="text-2xl font-black text-amber-700 dark:text-amber-400 mt-0.5">{stats.active_kitchen_tickets}</div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{stats.in_prep_count} cooking • {stats.ready_for_pickup} ready</span>
+              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Dine-In Table Capacity</span>
+              <div className="text-2xl font-black text-emerald-800 dark:text-emerald-400 mt-0.5">
+                {tables.filter(t => t.status === 'available').length} <span className="text-xs font-medium text-slate-500 dark:text-slate-400">/ {tables.length} Free</span>
+              </div>
+              <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold">
+                {tables.filter(t => t.status === 'dining' || t.status === 'in_prep').length} Tables Currently Occupied
+              </span>
             </div>
 
             <div className="p-3.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/80 border border-[#d1ded5] dark:border-slate-700">
-              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Avg Kitchen Ticket Latency</span>
-              <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{stats.avg_prep_time_mins} <span className="text-xs font-medium">mins</span></div>
-              <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">Target: &lt; 8.0 mins</span>
+              <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Active In-Kitchen Tickets</span>
+              <div className="text-2xl font-black text-amber-700 dark:text-amber-400 mt-0.5">{stats.active_kitchen_tickets}</div>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{stats.in_prep_count} cooking • {stats.ready_for_pickup} ready</span>
             </div>
 
             <div className="p-3.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/80 border border-[#d1ded5] dark:border-slate-700">
@@ -196,6 +220,75 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
           </button>
         </div>
       )}
+
+      {/* RESTAURANT FLOOR PLAN: LIVE TABLE AVAILABILITY STATUS */}
+      <div className="glass-panel p-5 rounded-2xl bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800 space-y-3 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e1eae4] dark:border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <Armchair className="h-5 w-5 text-emerald-700 dark:text-emerald-400" />
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Restaurant Floor Table Map</h3>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
+              12 Dine-In Tables
+            </span>
+          </div>
+
+          {/* Legend */}
+          <div className="flex items-center gap-3 text-[11px] font-bold">
+            <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Free / Available
+            </span>
+            <span className="flex items-center gap-1 text-amber-700 dark:text-amber-400">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" /> Cooking
+            </span>
+            <span className="flex items-center gap-1 text-rose-700 dark:text-rose-400">
+              <span className="h-2.5 w-2.5 rounded-full bg-rose-500" /> Dining (Occupied)
+            </span>
+          </div>
+        </div>
+
+        {/* 12-Table Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2">
+          {tables.map(tbl => {
+            const isAvailable = tbl.status === 'available';
+            const isCooking = tbl.status === 'in_prep';
+            const isDining = tbl.status === 'dining';
+
+            return (
+              <div
+                key={tbl.table_no}
+                className={`p-2.5 rounded-xl border text-center transition-all flex flex-col justify-between ${
+                  isAvailable
+                    ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800/80 text-emerald-950 dark:text-emerald-200'
+                    : isCooking
+                    ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800/80 text-amber-950 dark:text-amber-200 shadow-sm'
+                    : 'bg-rose-50 dark:bg-rose-950/30 border-rose-300 dark:border-rose-800/80 text-rose-950 dark:text-rose-200 shadow-sm'
+                }`}
+              >
+                <div>
+                  <div className="text-xs font-black">{tbl.table_no.replace('Table ', 'T-')}</div>
+                  <div className="text-[9px] font-bold text-slate-500 dark:text-slate-400">{tbl.capacity} Seats</div>
+                </div>
+
+                <div className="mt-1.5 pt-1.5 border-t border-black/5 dark:border-white/5">
+                  {isAvailable ? (
+                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 block">✓ Free</span>
+                  ) : isCooking ? (
+                    <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 block">🔥 Cooking</span>
+                  ) : (
+                    <button
+                      onClick={() => handleFreeTable(tbl.table_no)}
+                      className="w-full py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-[9px] font-bold shadow-sm transition-colors"
+                      title="Customers departed? Click to clear table"
+                    >
+                      Free Table
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* LIVE KITCHEN DISPLAY SYSTEM (KDS) KANBAN BOARD */}
       <div className="glass-panel p-6 rounded-2xl bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800 space-y-4 shadow-sm">
@@ -376,7 +469,7 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
             </div>
           </div>
 
-          {/* Column 4: Completed (Served) */}
+          {/* Column 4: Completed (Served & Dining / Cleared) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
               <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
@@ -385,20 +478,46 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
             </div>
 
             <div className="space-y-3">
-              {completedOrders.slice(0, 3).map(ord => (
-                <div key={ord.id} className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800 shadow-sm opacity-80 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-900 dark:text-white">#{ord.order_number} ({ord.table_no})</span>
-                    <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">✓ Served</span>
+              {completedOrders.slice(0, 4).map(ord => {
+                const isDineIn = ord.order_type === 'Dine-In';
+                const isTableOccupied = ord.table_status === 'dining' || ord.table_status === 'occupied';
+
+                return (
+                  <div key={ord.id} className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-[#d1ded5] dark:border-slate-700 shadow-sm space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-slate-900 dark:text-white">#{ord.order_number} ({ord.table_no})</span>
+                      <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-0.5">
+                        <CheckCheck className="h-3 w-3" /> Served
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                      {ord.items.map(it => `${it.quantity}x ${it.name}`).join(', ')}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[#e1eae4] dark:border-slate-700 text-[10px]">
+                      <span className="text-slate-500 font-mono font-bold">Rs. {ord.total_amount_lkr}</span>
+                      
+                      {/* Interactive "Clear & Free Table" button for Dine-In orders */}
+                      {isDineIn && (
+                        isTableOccupied ? (
+                          <button
+                            onClick={() => handleFreeTable(ord.table_no)}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center gap-1 shadow-sm transition-all hover:scale-105"
+                            title="Customers have finished and departed. Click to mark table free."
+                          >
+                            <Armchair className="h-3 w-3" /> Clear & Free Table
+                          </button>
+                        ) : (
+                          <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
+                            ✓ Table Cleared
+                          </span>
+                        )
+                      )}
+                    </div>
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {ord.items.map(it => `${it.quantity}x ${it.name}`).join(', ')}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-mono">
-                    Total: Rs. {ord.total_amount_lkr}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -532,30 +651,57 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Table / Order Ref</label>
-                  <input
-                    type="text"
-                    required
-                    value={tableNumber}
-                    onChange={(e) => setTableNumber(e.target.value)}
-                    className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-emerald-600"
-                    placeholder="e.g. Table 04 / Takeout"
-                  />
-                </div>
-
-                <div>
                   <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Order Channel</label>
                   <select
                     value={orderType}
                     onChange={(e) => setOrderType(e.target.value)}
                     className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-600"
                   >
-                    <option value="Dine-In">Dine-In</option>
+                    <option value="Dine-In">Dine-In (Select Table Below)</option>
                     <option value="Takeout">Takeaway / Takeout</option>
                     <option value="Delivery">Delivery Platform</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Selected Table</label>
+                  <select
+                    disabled={orderType !== 'Dine-In'}
+                    value={tableNumber}
+                    onChange={(e) => setTableNumber(e.target.value)}
+                    className="w-full bg-[#f8faf9] dark:bg-slate-800 border border-[#c6d7cd] dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-emerald-600 disabled:opacity-50"
+                  >
+                    {tables.map(t => (
+                      <option key={t.table_no} value={t.table_no}>
+                        {t.table_no} ({t.status === 'available' ? '✓ Free' : 'Occupied'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
+              {/* Free Tables Quick Chips */}
+              {orderType === 'Dine-In' && availableTables.length > 0 && (
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Quick Select Available Free Tables:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {availableTables.map(tbl => (
+                      <button
+                        key={tbl.table_no}
+                        type="button"
+                        onClick={() => setTableNumber(tbl.table_no)}
+                        className={`px-2.5 py-1 rounded-lg font-bold text-xs border transition-all ${
+                          tableNumber === tbl.table_no
+                            ? 'bg-emerald-700 text-white border-emerald-800 shadow-sm'
+                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                        }`}
+                      >
+                        {tbl.table_no}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <div className="flex justify-between font-bold mb-1">
