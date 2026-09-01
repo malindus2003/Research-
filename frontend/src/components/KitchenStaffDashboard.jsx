@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Clock, Flame, Award, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2, TrendingUp, Utensils, X, Lock, LogIn, Key, Smartphone, Coffee, ChefHat, Send, CheckSquare, Pizza, Plus, Minus, Hash, Search, Layers } from 'lucide-react';
+import { Users, Clock, Flame, Award, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2, TrendingUp, Utensils, X, Lock, LogIn, Key, Smartphone, Coffee, ChefHat, Send, CheckSquare, Pizza, Plus, Minus, Hash, Search } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ReferenceArea } from 'recharts';
 import axios from 'axios';
 
 export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin' }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeRoleView, setActiveRoleView] = useState(currentRole === 'staff' ? 'staff_view' : 'all');
-
-  useEffect(() => {
-    if (currentRole === 'staff') {
-      setActiveRoleView('staff_view');
-    } else {
-      setActiveRoleView('all');
-    }
-  }, [currentRole]);
 
   const [showSeasonalRush, setShowSeasonalRush] = useState(true);
   const [showLunchRush, setShowLunchRush] = useState(true);
@@ -574,67 +565,8 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
   return (
     <div className="space-y-6">
 
-      {/* Role Navigation Bar */}
-      <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 overflow-x-auto">
-          {currentRole === 'admin' && (
-            <button
-              onClick={() => setActiveRoleView('all')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'all'
-                  ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
-                }`}
-            >
-              <Layers className="h-3.5 w-3.5" /> All Views (Admin Full Suite)
-            </button>
-          )}
-
-          <button
-            onClick={() => setActiveRoleView('staff_view')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'staff_view'
-                ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
-              }`}
-          >
-            <Utensils className="h-3.5 w-3.5" /> 🍳 Kitchen Staff Station View
-          </button>
-
-          {currentRole === 'admin' && (
-            <button
-              onClick={() => setActiveRoleView('admin_analytics')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'admin_analytics'
-                  ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
-                }`}
-            >
-              <TrendingUp className="h-3.5 w-3.5" /> 📊 Executive Analytics & Staffing AI
-            </button>
-          )}
-
-          <button
-            onClick={() => setActiveRoleView('skill_matrix')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'skill_matrix'
-                ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
-              }`}
-          >
-            <Award className="h-3.5 w-3.5" /> 🎓 Staff Skill Matrix & Self-Assessment
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-          <span>Active Role:</span>
-          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${currentRole === 'admin'
-              ? 'bg-purple-100 text-purple-800 border border-purple-300 dark:bg-purple-950 dark:text-purple-300'
-              : 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300'
-            }`}>
-            {currentRole === 'admin' ? '🛡️ Executive Admin' : '👨‍🍳 Kitchen Staff'}
-          </span>
-        </div>
-      </div>
-
       {/* Critical Efficiency Alert Banner (< 50%) */}
-      {isCriticalEfficiency && (activeRoleView === 'all' || activeRoleView === 'admin_analytics') && (
+      {isCriticalEfficiency && (
         <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-500 dark:bg-rose-950/60 dark:border-rose-500/80 text-rose-950 dark:text-rose-100 shadow-xl flex items-center justify-between gap-4 animate-pulse">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-rose-600 text-white font-bold flex-shrink-0 shadow-md">
@@ -657,9 +589,8 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
         </div>
       )}
 
-      {/* Top Banner (Admin & Analytics View) */}
-      {(activeRoleView === 'all' || activeRoleView === 'admin_analytics') && (
-        <div className="glass-panel p-6 rounded-2xl space-y-5">
+      {/* Top Banner */}
+      <div className="glass-panel p-6 rounded-2xl space-y-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
             <div>
               <div className="flex items-center gap-2">
@@ -826,11 +757,9 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             )}
           </div>
         </div>
-      )}
 
-      {/* Real-Time Mobile Order Dispatch & Station Task Routing Section (Kitchen Staff & All Views) */}
-      {(activeRoleView === 'all' || activeRoleView === 'staff_view') && (
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-5">
+      {/* Real-Time Mobile Order Dispatch & Station Task Routing Section */}
+      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
             <div>
               <div className="flex items-center gap-2">
@@ -1032,11 +961,9 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             ))}
           </div>
         </div>
-      )}
 
-      {/* Peak-Hour Workload & Staffing Demand Chart (Admin & Analytics Views) */}
-      {(activeRoleView === 'all' || activeRoleView === 'admin_analytics') && (
-        <div className="glass-panel p-6 rounded-2xl space-y-4">
+      {/* Peak-Hour Workload & Staffing Demand Chart */}
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Peak-Hour Workload & Staffing Forecast (07:00 - 22:30)</h3>
@@ -1265,7 +1192,6 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             </ResponsiveContainer>
           </div>
         </div>
-      )}
 
       {/* Kitchen Station Bottleneck Monitors */}
       <div className="glass-panel p-6 rounded-2xl space-y-4">
@@ -1441,9 +1367,8 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
         </div>
       </div>
 
-      {/* Staff Skill Matrix & Progression Paths (Staff, Skill Matrix & All Views) */}
-      {(activeRoleView === 'all' || activeRoleView === 'skill_matrix' || activeRoleView === 'staff_view') && (
-        <div className="glass-panel p-6 rounded-2xl space-y-4">
+      {/* Staff Skill Matrix & Progression Paths */}
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Staff Skill-Gap Analysis & Progression Paths</h3>
@@ -1592,7 +1517,6 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             })}
           </div>
         </div>
-      )}
 
       {/* Mobile Waiter Order Entry Simulation Modal with Sri Lankan & Pizza Menu */}
       {showOrderSimulatorModal && (
