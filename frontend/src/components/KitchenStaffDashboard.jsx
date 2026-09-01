@@ -61,7 +61,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
       id: "dir-2",
       stationId: "station-3",
       priority: "HIGH",
-      title: "🔥 GRILL BOTTLENECK ALERT: Grill & Seafood Station prep latency spiked to 14.0 mins (9 orders queue).",
+      title: "🔥 GRILL QUEUE ALERT: Grill & Seafood Station prep latency spiked to 14.0 mins (9 orders queue).",
       actionText: "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching (Seafood Freshness Grading)",
       targetStaff: "T. Silva",
       targetStation: "Grill & Seafood Station",
@@ -73,7 +73,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
       id: "dir-3",
       stationId: "station-2",
       priority: "MEDIUM",
-      title: "⚡ PREP OPTIMIZATION: Pre-portion 50x Curry bases at 5:30 PM to bypass assembly bottlenecks.",
+      title: "⚡ PREP OPTIMIZATION: Pre-portion 50x Curry bases at 5:30 PM to bypass assembly queue delays.",
       actionText: "Pre-portion 50x Curry bases at 5:30 PM at Curry & Rice Assembly Bay",
       targetStaff: "K. Perera",
       targetStation: "Curry & Rice Assembly Bay",
@@ -136,8 +136,8 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
       id: newId,
       stationId: "station-1",
       priority: "REAL-TIME SURGE",
-      title: `🚨 REAL-TIME BOTTLENECK SURGE (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}): Ticket queue at Hot Wok & Kottu Station surged to 18 tickets!`,
-      actionText: "Reallocate S. Fernando from Cold Prep to Hot Wok Station immediately to clear queue bottleneck",
+      title: `🚨 REAL-TIME QUEUE SURGE (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}): Ticket queue at Hot Wok & Kottu Station surged to 18 tickets!`,
+      actionText: "Reallocate S. Fernando from Cold Prep to Hot Wok Station immediately to clear queue overload",
       targetStaff: "S. Fernando",
       targetStation: "Hot Wok & Kottu Station",
       mitigatedLoad: 50,
@@ -163,7 +163,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
       setData({ ...data, stations: updatedStations });
     }
 
-    setDismissedToast("🚨 New real-time bottleneck alert popped up! High order volume detected at Hot Wok Station.");
+    setDismissedToast("🚨 New real-time queue alert popped up! High order volume detected at Hot Wok Station.");
     setTimeout(() => setDismissedToast(""), 4000);
   };
 
@@ -283,10 +283,10 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
     setKitchenOrders(prev => [newOrder, ...prev]);
     setNextOrderNumCounter(prev => prev + 1);
     setShowOrderSimulatorModal(false);
-    setDismissedToast(`📱 Order #${currentOrderNo} received! Real-Time Kitchen Station Workloads & Bottlenecks updated live.`);
+    setDismissedToast(`📱 Order #${currentOrderNo} received! Real-Time Kitchen Station Workloads & Queue Status updated live.`);
     setTimeout(() => setDismissedToast(""), 4500);
 
-    // Dynamic real-time update across ALL station workloads & bottlenecks
+    // Dynamic real-time update across ALL station workloads & line queues
     if (data && data.stations) {
       const updatedStations = data.stations.map(st => {
         if (st.id === "station-1" && newCookingTasks.length > 0) {
@@ -376,7 +376,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             recommended_cooks: targetCooks,
             load_level: newLoad,
             bottleneck_status: newLoad >= 80 ? "High Delay Risk" : "Smooth Flow",
-            action: newLoad < 80 ? "Optimal line pacing restored — bottleneck eliminated" : st.action
+            action: newLoad < 80 ? "Optimal line pacing restored — queue delay eliminated" : st.action
           };
         }
         if (st.id === "station-3" && taskType === "grillTasks") {
@@ -514,7 +514,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
         stations: [
           { id: "station-1", name: "Hot Wok & Kottu Station", active_cooks: 2, recommended_cooks: 3, avg_prep_time_mins: 8.5, target_prep_time_mins: 6.0, queue_length: 14, load_level: 92, bottleneck_status: "High Delay Risk", action: "Reallocate S. Fernando from Salad & Cold Prep Station to Hot Wok & Kottu Station based on skill matching (Enrolled in 'High-Volume Stir-Fry Optimization')" },
           { id: "station-2", name: "Curry & Rice Assembly Bay", active_cooks: 2, recommended_cooks: 2, avg_prep_time_mins: 4.2, target_prep_time_mins: 4.5, queue_length: 4, load_level: 55, bottleneck_status: "Smooth Flow", action: "Maintain current line staffing" },
-          { id: "station-3", name: "Grill & Seafood Station", active_cooks: 1, recommended_cooks: 2, avg_prep_time_mins: 14.0, target_prep_time_mins: 10.0, queue_length: 9, load_level: 84, bottleneck_status: "Moderate Bottleneck", action: "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching (Seafood Freshness Grading & Quick-Sear Techniques)" },
+          { id: "station-3", name: "Grill & Seafood Station", active_cooks: 1, recommended_cooks: 2, avg_prep_time_mins: 14.0, target_prep_time_mins: 10.0, queue_length: 9, load_level: 84, bottleneck_status: "Moderate Queue Load", action: "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching (Seafood Freshness Grading & Quick-Sear Techniques)" },
           { id: "station-4", name: "Salad & Cold Prep Station", active_cooks: 2, recommended_cooks: 1, avg_prep_time_mins: 3.0, target_prep_time_mins: 4.0, queue_length: 2, load_level: 30, bottleneck_status: "Underutilized", action: "Reassign S. Fernando to Hot Wok & Kottu Station during 7 PM rush based on skill matching" }
         ],
         staff: [
@@ -545,7 +545,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
         ai_allocation_suggestions: [
           "⚠️ DINNER RUSH ALERT: Station 1 (Hot Wok) requires +1 Cook at 7:00 PM due to 115 projected orders.",
           "Reallocate S. Fernando from Cold Prep to Hot Wok during 7:00 PM - 9:00 PM window.",
-          "Pre-portion 50x Curry bases at 5:30 PM to bypass assembly bottlenecks."
+          "Pre-portion 50x Curry bases at 5:30 PM to bypass assembly queue delays."
         ]
       });
     } finally {
@@ -565,7 +565,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
   return (
     <div className="space-y-6">
 
-      {/* Critical Efficiency Alert Banner (< 50%) */}
+      {/* Critical Efficiency Floor Alert (Below 50%) */}
       {isCriticalEfficiency && (
         <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-500 dark:bg-rose-950/60 dark:border-rose-500/80 text-rose-950 dark:text-rose-100 shadow-xl flex items-center justify-between gap-4 animate-pulse">
           <div className="flex items-center gap-3">
@@ -582,7 +582,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                 </span>
               </div>
               <p className="text-xs font-semibold text-rose-900 dark:text-rose-200 mt-1">
-                Kitchen overall efficiency has dropped to {rawEfficiency} (below the required 50% operational floor)! Immediate staff reallocation and line bottleneck intervention required.
+                Kitchen overall efficiency has dropped to {rawEfficiency} (below the required 50% operational floor)! Immediate staff reallocation and line queue intervention required.
               </p>
             </div>
           </div>
@@ -596,11 +596,11 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Kitchen Efficiency & Dynamic Staff Optimization</h2>
                 <span className="text-xs px-2.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 font-bold">
-                  Workflow & Bottleneck AI
+                  Workflow & Queue AI
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-                Real-time line bottleneck monitoring, peak-hour staff allocation, and staff progression
+                Real-time station queue monitoring, peak-hour staff allocation, and staff progression
               </p>
             </div>
 
@@ -646,7 +646,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                     AI Dynamic Staff Allocation Directives
                   </h3>
                   <p className="text-[11px] text-orange-800 dark:text-orange-300 font-medium">
-                    Updates dynamically based on real-time order queue bottlenecks and staff skill matching
+                    Updates dynamically based on real-time order queue surges and staff skill matching
                   </p>
                 </div>
               </div>
@@ -670,7 +670,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
               <div className="p-4 rounded-xl bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 text-xs font-bold flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                  <span>All line bottlenecks resolved! Kitchen staffing operating at optimal efficiency.</span>
+                  <span>All line queues balanced! Kitchen staffing operating at optimal efficiency.</span>
                 </div>
                 <button
                   onClick={() => {
@@ -691,7 +691,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                         id: `dir-${Date.now()}-2`,
                         stationId: "station-3",
                         priority: "HIGH",
-                        title: "🔥 GRILL BOTTLENECK ALERT: Grill & Seafood Station prep latency spiked to 14.0 mins.",
+                        title: "🔥 GRILL QUEUE ALERT: Grill & Seafood Station prep latency spiked to 14.0 mins.",
                         actionText: "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching",
                         targetStaff: "T. Silva",
                         targetStation: "Grill & Seafood Station",
@@ -1193,22 +1193,22 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
           </div>
         </div>
 
-      {/* Kitchen Station Bottleneck Monitors */}
+      {/* Kitchen Station Workload & Queue Monitors */}
       <div className="glass-panel p-6 rounded-2xl space-y-4">
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Real-Time Kitchen Station Workload & Bottlenecks</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Real-Time Kitchen Station Workload & Queue Status</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Monitoring queue latency and load balancing across all 4 production stations</p>
           </div>
         </div>
 
-        {/* High Workload & Bottleneck Alerts Panel */}
+        {/* High Workload & Queue Alerts Panel */}
         {data.stations.some(st => st.load_level >= 80) && (
           <div className="p-4 rounded-2xl bg-rose-50/90 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-500/40 shadow-sm space-y-3">
             <div className="flex items-center gap-2 border-b border-rose-200 dark:border-rose-800/60 pb-2">
               <AlertTriangle className="h-4 w-4 text-rose-600 dark:text-rose-400 flex-shrink-0 animate-pulse" />
               <h4 className="text-xs font-black uppercase tracking-wider text-rose-900 dark:text-rose-200">
-                High Workload & Line Bottleneck Alerts
+                High Workload & Line Queue Alerts
               </h4>
               <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-600 text-white ml-auto">
                 {data.stations.filter(st => st.load_level >= 80).length} Stations Critical
@@ -1238,7 +1238,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                     </p>
                     <div className="text-xs text-rose-800 dark:text-rose-300 font-bold flex items-center gap-1.5 pt-0.5">
                       <ArrowRight className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400 flex-shrink-0" />
-                      <span>Action to Eliminate Bottleneck: <span className="text-rose-950 dark:text-rose-100 font-extrabold underline">{st.action}</span></span>
+                      <span>Recommended Action: <span className="text-rose-950 dark:text-rose-100 font-extrabold underline">{st.action}</span></span>
                     </div>
                   </div>
 
@@ -1279,13 +1279,13 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                       });
 
                       setData({ ...data, stations: updatedStations, staff: updatedStaff });
-                      setDismissedToast(`⚡ Dynamic Bottleneck Fix Applied: ${targetStaffName} reallocated to ${targetStationName}! Staff Matrix updated.`);
+                      setDismissedToast(`⚡ Dynamic Line Balancing Applied: ${targetStaffName} reallocated to ${targetStationName}! Staff Matrix updated.`);
                       setTimeout(() => setDismissedToast(""), 4500);
                     }}
                     className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs whitespace-nowrap self-start sm:self-auto cursor-pointer transition-all flex items-center gap-1"
                   >
                     <ShieldCheck className="h-3.5 w-3.5" />
-                    <span>Apply Bottleneck Fix & Reallocate</span>
+                    <span>Apply Reallocation & Balance Line</span>
                   </button>
                 </div>
               ))}
@@ -1310,7 +1310,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                   {isHighWorkload && (
                     <div className="mb-2 flex items-center gap-1.5 text-[10px] font-black uppercase text-rose-700 dark:text-rose-400">
                       <AlertTriangle className="h-3.5 w-3.5 animate-pulse" />
-                      <span>High Workload Bottleneck Alert</span>
+                      <span>High Workload & Delay Risk Alert</span>
                     </div>
                   )}
 
@@ -1356,7 +1356,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                       : 'bg-amber-50/70 border-amber-200 dark:bg-amber-950/60 dark:border-amber-900/80'
                     }`}>
                     <span className="text-[10px] uppercase font-black text-rose-800 dark:text-rose-400 flex items-center gap-1">
-                      <ShieldCheck className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" /> Action to Eliminate Bottleneck:
+                      <ShieldCheck className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" /> Recommended Action:
                     </span>
                     <p className="text-xs text-slate-900 dark:text-white mt-1 font-extrabold leading-tight">{st.action}</p>
                   </div>

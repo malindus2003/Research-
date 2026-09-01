@@ -37,7 +37,7 @@ KITCHEN_STATIONS = [
         "target_prep_time_mins": 10.0,
         "queue_length": 9,
         "load_level": 84,
-        "bottleneck_status": "Moderate Bottleneck",
+        "bottleneck_status": "Moderate Queue Load",
         "action": "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching (Seafood Freshness Grading & Quick-Sear Techniques)"
     },
     {
@@ -162,7 +162,7 @@ def get_kitchen_metrics():
         "ai_allocation_suggestions": [
             "⚠️ DINNER RUSH ALERT: Station 1 (Hot Wok) requires +1 Cook at 7:00 PM due to 115 projected orders.",
             "Reallocate S. Fernando from Cold Prep to Hot Wok during 7:00 PM - 9:00 PM window.",
-            "Pre-portion 50x Curry bases at 5:30 PM to bypass assembly bottlenecks."
+            "Pre-portion 50x Curry bases at 5:30 PM to bypass assembly queue delays."
         ]
     }
 

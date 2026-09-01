@@ -101,7 +101,7 @@ export default function CentralExecutiveDashboard({
               Kitchen & Staff
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
-              Peak-hour prediction, line bottleneck detection, and staff career pathways.
+              Peak-hour prediction, line workload balancing, and staff career pathways.
             </p>
           </div>
           <div className="mt-4 pt-3 border-t border-[#e1eae4] dark:border-slate-800 text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center justify-between">

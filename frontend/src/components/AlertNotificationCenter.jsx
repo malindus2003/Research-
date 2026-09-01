@@ -415,7 +415,7 @@ export default function AlertNotificationCenter({
                     className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-bold"
                   >
                     <option value="Spoilage">Spoilage & Cold Chain</option>
-                    <option value="Kitchen">Kitchen Line & Bottleneck</option>
+                    <option value="Kitchen">Kitchen Line & Queue Status</option>
                     <option value="Demand">Demand & Pre-Shift Prep</option>
                     <option value="Waste">Smart Waste Bin</option>
                   </select>
