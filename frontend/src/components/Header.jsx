@@ -245,9 +245,6 @@ export default function Header({
                   <Sparkles className="h-2.5 w-2.5 text-emerald-600 dark:text-emerald-400" /> AI & IoT Cloud Core
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                Research Project J26-IT-333 • SLIIT 2026
-              </span>
             </div>
           </div>
 
