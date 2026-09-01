@@ -26,8 +26,11 @@ export default function App() {
   // Theme state: defaults to false (Light Mode) for bright, clear visibility
   const [isDarkMode, setIsDarkMode] = useState(false);
   
+  // Active User Role: 'admin' (Executive/All), 'cashier' (POS/Billing), 'staff' (Kitchen KDS/Ops)
+  const [currentRole, setCurrentRole] = useState('admin');
+  
   // Top Level Navigation Module: 'executive', 'orders', 'inventory', 'spoilage', 'kitchen', 'demand', 'waste'
-  const [activeModule, setActiveModule] = useState('orders');
+  const [activeModule, setActiveModule] = useState('executive');
   
   // Spoilage Sub-Tabs: 'vision', 'assessor', 'inventory', 'sensors', 'simulator'
   const [spoilageSubTab, setSpoilageSubTab] = useState('vision');
@@ -101,10 +104,12 @@ export default function App() {
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200`}>
       
-      {/* Clean Navigation Header with Live Alert Counter & Theme Toggle */}
+      {/* Clean Navigation Header with Live Alert Counter, Role Switcher & Theme Toggle */}
       <Header
         activeModule={activeModule}
         onSelectModule={setActiveModule}
+        currentRole={currentRole}
+        onSelectRole={setCurrentRole}
         stats={stats}
         onRefresh={fetchAllData}
         activeAlertCount={totalActiveAlertCount}

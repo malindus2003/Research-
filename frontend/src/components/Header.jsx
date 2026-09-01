@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Activity, 
   Bell, 
@@ -13,12 +13,51 @@ import {
   ShoppingBag, 
   Package,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  ChevronDown,
+  ChefHat,
+  CreditCard,
+  Crown,
+  Armchair,
+  Receipt,
+  Flame
 } from 'lucide-react';
+
+export const ROLES = [
+  {
+    id: 'admin',
+    title: 'Admin (Full Access)',
+    shortTitle: 'Admin',
+    description: 'Executive overview, AI models, inventory valuation, and research modules',
+    icon: <Crown className="h-4 w-4 text-amber-500" />,
+    badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
+    defaultModule: 'executive'
+  },
+  {
+    id: 'cashier',
+    title: 'Cashier (POS & Billing)',
+    shortTitle: 'Cashier',
+    description: 'Front-of-House POS menu ordering, table floor map, and sales ledger',
+    icon: <CreditCard className="h-4 w-4 text-emerald-500" />,
+    badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+    defaultModule: 'orders'
+  },
+  {
+    id: 'staff',
+    title: 'Kitchen & Floor Staff',
+    shortTitle: 'Kitchen Staff',
+    description: 'Live KDS cooking tickets, station line load, and cold storage restock',
+    icon: <ChefHat className="h-4 w-4 text-blue-500" />,
+    badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
+    defaultModule: 'orders'
+  }
+];
 
 export default function Header({
   activeModule,
   onSelectModule,
+  currentRole = 'admin',
+  onSelectRole,
   stats,
   onRefresh,
   activeAlertCount,
@@ -26,26 +65,44 @@ export default function Header({
   isDarkMode,
   onToggleTheme
 }) {
-  const modules = [
+  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setRoleDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // ALL 7 MODULE DEFINITIONS
+  const allModules = [
     { 
       id: 'executive', 
       label: 'Executive Hub', 
       shortLabel: 'Executive', 
       badge: 'Core',
+      roles: ['admin'],
       icon: <Layers className="h-3.5 w-3.5" /> 
     },
     { 
       id: 'orders', 
-      label: 'Orders & POS', 
-      shortLabel: 'Orders', 
+      label: currentRole === 'staff' ? 'Kitchen Display (KDS)' : 'Orders & POS', 
+      shortLabel: currentRole === 'staff' ? 'KDS Tickets' : 'Orders & POS', 
       badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
       badgeColor: 'bg-blue-500',
-      icon: <ShoppingBag className="h-3.5 w-3.5" /> 
+      roles: ['admin', 'cashier', 'staff'],
+      icon: currentRole === 'staff' ? <Flame className="h-3.5 w-3.5" /> : <ShoppingBag className="h-3.5 w-3.5" /> 
     },
     { 
       id: 'inventory', 
       label: 'Inventory & Stock', 
       shortLabel: 'Inventory', 
+      roles: ['admin', 'staff'],
       icon: <Package className="h-3.5 w-3.5" /> 
     },
     { 
@@ -54,36 +111,56 @@ export default function Header({
       shortLabel: 'Food Spoilage', 
       badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
       badgeColor: 'bg-rose-500',
+      roles: ['admin', 'staff'],
       icon: <Cpu className="h-3.5 w-3.5" /> 
     },
     { 
       id: 'kitchen', 
-      label: 'Kitchen & Staff', 
-      shortLabel: 'Kitchen', 
+      label: 'Kitchen Stations & Staff', 
+      shortLabel: 'Kitchen Stations', 
+      roles: ['admin', 'staff'],
       icon: <Users className="h-3.5 w-3.5" /> 
     },
     { 
       id: 'demand', 
       label: 'Demand Forecasting', 
       shortLabel: 'Demand', 
+      roles: ['admin'],
       icon: <TrendingUp className="h-3.5 w-3.5" /> 
     },
     { 
       id: 'waste', 
       label: 'Smart Waste Bin', 
       shortLabel: 'Waste Bin', 
+      roles: ['admin', 'staff'],
       icon: <Trash2 className="h-3.5 w-3.5" /> 
     }
   ];
+
+  // Filter modules visible for the active role
+  const visibleModules = allModules.filter(m => m.roles.includes(currentRole));
+  const activeRoleObj = ROLES.find(r => r.id === currentRole) || ROLES[0];
+
+  const handleRoleSwitch = (role) => {
+    if (onSelectRole) {
+      onSelectRole(role.id);
+    }
+    setRoleDropdownOpen(false);
+    // Switch active module to role default if current is not in the new role
+    const isModuleAllowed = allModules.find(m => m.id === activeModule)?.roles.includes(role.id);
+    if (!isModuleAllowed) {
+      onSelectModule(role.defaultModule);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/90 dark:bg-slate-950/90 border-b border-[#cbdad0]/80 dark:border-slate-800/80 transition-colors shadow-sm">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-2.5 space-y-2">
         
-        {/* Top Tier: Brand Identity, Live Telemetry Status & System Tools */}
+        {/* Top Tier: Brand Identity, Role Switcher Dropdown & Tools */}
         <div className="flex items-center justify-between gap-3">
           
-          {/* Brand Logo with Live Pulse */}
+          {/* Brand Logo with Live Telemetry Pulse */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <div className="relative">
               <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 flex items-center justify-center shadow-lg shadow-emerald-700/25 text-white font-black">
@@ -110,16 +187,67 @@ export default function Header({
             </div>
           </div>
 
-          {/* Right Tools Controls (Dark/Light Switch, Refresh, Alert Bell) */}
+          {/* Right Tools & Role Dropdown */}
           <div className="flex items-center gap-2">
             
-            {/* Quick Status Pill */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#f0f5f2] dark:bg-slate-900 border border-[#d5e2d9] dark:border-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>5 Cold Chambers Online</span>
+            {/* ROLE SELECTOR DROPDOWN */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-black flex items-center gap-2 transition-all shadow-sm hover:scale-105 ${activeRoleObj.badgeColor} bg-white dark:bg-slate-900`}
+                title="Switch User Role / View"
+              >
+                <div className="flex items-center gap-1.5">
+                  {activeRoleObj.icon}
+                  <span className="hidden sm:inline">Role:</span>
+                  <span className="font-extrabold">{activeRoleObj.shortTitle}</span>
+                </div>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${roleDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu Modal */}
+              {roleDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-50 space-y-1 animate-fade-in">
+                  <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">Switch Workspace Persona</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Select role to tailor navigation</span>
+                  </div>
+
+                  {ROLES.map((role) => {
+                    const isSelected = role.id === currentRole;
+                    return (
+                      <button
+                        key={role.id}
+                        onClick={() => handleRoleSwitch(role)}
+                        className={`w-full p-2.5 rounded-xl text-left transition-all flex items-start gap-2.5 ${
+                          isSelected
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700/60'
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                        }`}
+                      >
+                        <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs flex-shrink-0 mt-0.5">
+                          {role.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 dark:text-white">{role.title}</span>
+                            {isSelected && (
+                              <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400">Active</span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight line-clamp-2">
+                            {role.description}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Theme Toggle Pill Button */}
+            {/* Theme Toggle Button */}
             <button
               onClick={onToggleTheme}
               className="p-2 rounded-xl bg-[#f0f5f2] hover:bg-[#e4ece7] dark:bg-slate-900 dark:hover:bg-slate-800 border border-[#d5e2d9] dark:border-slate-800 text-slate-700 dark:text-slate-200 transition-all hover:scale-105 shadow-sm"
@@ -147,7 +275,7 @@ export default function Header({
               className="relative px-3 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs transition-all hover:scale-105 shadow-md shadow-emerald-800/20 flex items-center gap-2"
             >
               <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Alert Directives</span>
+              <span className="hidden sm:inline">Alerts</span>
               {activeAlertCount > 0 ? (
                 <span className="flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-rose-600 text-[10px] font-black text-white shadow">
                   {activeAlertCount}
@@ -161,10 +289,10 @@ export default function Header({
 
         </div>
 
-        {/* Bottom Tier: Floating Segmented Dock with 7 Navigation Modules */}
+        {/* Bottom Tier: Floating Segmented Dock Tailored by Selected Role */}
         <div className="p-1 rounded-2xl bg-[#edf4f0] dark:bg-slate-900/90 border border-[#d1ded5] dark:border-slate-800/90 shadow-inner">
           <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
-            {modules.map((m) => {
+            {visibleModules.map((m) => {
               const isActive = activeModule === m.id;
               return (
                 <button
