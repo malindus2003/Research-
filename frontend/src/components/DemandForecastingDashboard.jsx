@@ -17,16 +17,13 @@ export default function DemandForecastingDashboard({ isDarkMode, currentRole = '
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'analytics', 'xai', 'simulator', 'retraining', 'closed_loop'
-  const [userRole, setUserRole] = useState(currentRole === 'staff' ? 'staff' : (currentRole === 'manager' ? 'manager' : 'admin'));
+  const [userRole, setUserRole] = useState(currentRole === 'staff' ? 'staff' : 'admin');
   
   useEffect(() => {
     if (currentRole === 'staff') {
       setUserRole('staff');
       setActiveTab('overview');
-    } else if (currentRole === 'manager') {
-      setUserRole('manager');
-      if (activeTab === 'retraining') setActiveTab('overview');
-    } else if (currentRole === 'admin') {
+    } else {
       setUserRole('admin');
     }
   }, [currentRole]);
@@ -363,12 +360,12 @@ export default function DemandForecastingDashboard({ isDarkMode, currentRole = '
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
 
   const allTabs = [
-    { id: 'overview', label: 'Daily Prep Guidance', icon: <Utensils className="h-4 w-4" />, roles: ['staff', 'manager', 'admin'] },
-    { id: 'analytics', label: '7-Day & Shift Trends', icon: <BarChart3 className="h-4 w-4" />, roles: ['manager', 'admin'] },
-    { id: 'xai', label: 'Explainable AI (XAI)', icon: <Cpu className="h-4 w-4" />, roles: ['manager', 'admin'] },
-    { id: 'simulator', label: 'What-If Simulation Sandbox', icon: <Sliders className="h-4 w-4" />, roles: ['manager', 'admin'] },
+    { id: 'overview', label: 'Daily Prep Guidance', icon: <Utensils className="h-4 w-4" />, roles: ['staff', 'admin'] },
+    { id: 'analytics', label: '7-Day & Shift Trends', icon: <BarChart3 className="h-4 w-4" />, roles: ['admin'] },
+    { id: 'xai', label: 'Explainable AI (XAI)', icon: <Cpu className="h-4 w-4" />, roles: ['admin'] },
+    { id: 'simulator', label: 'What-If Simulation Sandbox', icon: <Sliders className="h-4 w-4" />, roles: ['admin'] },
     { id: 'retraining', label: 'Data Pipeline & Retraining', icon: <Database className="h-4 w-4" />, roles: ['admin'] },
-    { id: 'closed_loop', label: 'Closed Feedback Loop', icon: <Sparkles className="h-4 w-4" />, roles: ['manager', 'admin'] }
+    { id: 'closed_loop', label: 'Closed Feedback Loop', icon: <Sparkles className="h-4 w-4" />, roles: ['admin'] }
   ];
 
   const visibleTabs = allTabs.filter(t => t.roles.includes(userRole));
@@ -411,54 +408,8 @@ export default function DemandForecastingDashboard({ isDarkMode, currentRole = '
           </div>
         </div>
 
-        {/* Role-Based Access View Selector (Presentation Feature) */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5 mt-5 border-t border-[#e2ece5] dark:border-slate-800">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5 text-emerald-600" />
-              <span>Role View:</span>
-            </span>
-            <div className="flex items-center bg-[#f0f5f2] dark:bg-slate-800 p-1 rounded-xl border border-[#d5e2d9] dark:border-slate-700 shadow-inner">
-              <button
-                onClick={() => { setUserRole('staff'); setActiveTab('overview'); }}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  userRole === 'staff'
-                    ? 'bg-emerald-700 text-white shadow-sm'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                👨‍🍳 Kitchen Staff
-              </button>
-              <button
-                onClick={() => { setUserRole('manager'); setActiveTab('overview'); }}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  userRole === 'manager'
-                    ? 'bg-emerald-700 text-white shadow-sm'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                👔 Manager
-              </button>
-              <button
-                onClick={() => { setUserRole('admin'); }}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  userRole === 'admin'
-                    ? 'bg-emerald-700 text-white shadow-sm'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                ⚙️ Admin / ML Eng
-              </button>
-            </div>
-          </div>
-
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-            Showing {visibleTabs.length} tabs for <strong>{userRole === 'staff' ? 'Kitchen Staff' : userRole === 'manager' ? 'Restaurant Manager' : 'Admin'}</strong>
-          </span>
-        </div>
-
         {/* Sub-Navigation Tabs (Filtered by Role) */}
-        <div className="flex items-center gap-2 overflow-x-auto pt-3">
+        <div className="flex items-center gap-2 overflow-x-auto pt-4 mt-4 border-t border-[#e2ece5] dark:border-slate-800">
           {visibleTabs.map(tab => (
             <button
               key={tab.id}
