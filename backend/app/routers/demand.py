@@ -272,6 +272,8 @@ def get_demand_forecasts():
         "contextual_factors": {
             "weather_condition": "Heavy Evening Rain (24°C)",
             "weather_impact": "+18% delivery & hot comfort meals surge",
+            "reservations_booked": 64,
+            "active_promotions": "10% Family Dinner Flash Deal",
             "local_events": "Inter-University Rugby Match (Nearby Venue)",
             "operating_shift": "Double Shift (Lunch 11:30-15:00 / Dinner 18:30-22:30)",
             "public_holiday_status": "Poya / Holiday Eve",

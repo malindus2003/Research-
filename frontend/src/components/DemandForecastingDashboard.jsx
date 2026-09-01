@@ -17,6 +17,7 @@ export default function DemandForecastingDashboard({ isDarkMode }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'analytics', 'xai', 'simulator', 'retraining', 'closed_loop'
+  const [userRole, setUserRole] = useState('admin'); // 'staff', 'manager', 'admin'
   
   // Search & Filter
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -348,8 +349,6 @@ export default function DemandForecastingDashboard({ isDarkMode }) {
   });
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
-
-  const [userRole, setUserRole] = useState('admin'); // 'staff', 'manager', 'admin'
 
   const allTabs = [
     { id: 'overview', label: 'Daily Prep Guidance', icon: <Utensils className="h-4 w-4" />, roles: ['staff', 'manager', 'admin'] },
