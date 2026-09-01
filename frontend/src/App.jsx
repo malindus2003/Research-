@@ -133,11 +133,13 @@ export default function App() {
           />
         )}
 
-        {/* Module 2: Order Management & Live POS */}
-        {activeModule === 'orders' && (
+        {/* Module 2: Order Management Single Views & Combined Admin POS */}
+        {(activeModule === 'orders' || activeModule === 'pos_menu' || activeModule === 'tables_map' || activeModule === 'orders_ledger' || activeModule === 'kds') && (
           <OrderManagementDashboard
             onRefresh={fetchAllData}
             isDarkMode={isDarkMode}
+            currentRole={currentRole}
+            viewMode={activeModule === 'orders' ? 'all' : activeModule}
           />
         )}
 

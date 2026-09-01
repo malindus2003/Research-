@@ -471,3 +471,66 @@ def get_order_stats():
         "avg_prep_time_mins": 7.8,
         "on_time_fulfillment_rate": "94.2%"
     }
+
+
+@router.get("/daily-sales")
+def get_historical_daily_sales(days: int = 14):
+    """Retrieve historical daily sales data, revenue trends, and order volumes for past days."""
+    today = datetime.now()
+    history = []
+    
+    # Pre-calculated realistic seasonal patterns
+    base_orders = [417, 395, 428, 380, 442, 490, 510, 405, 388, 430, 415, 465, 480, 417]
+    base_revenues = [497040.0, 462500.0, 512000.0, 440200.0, 538900.0, 612400.0, 645000.0, 478000.0, 452000.0, 518000.0, 495000.0, 572000.0, 598000.0, 497040.0]
+    top_dishes = [
+        "Chicken Kottu Roti Supreme",
+        "Grilled Atlantic Salmon Steak",
+        "Prime Beef Sirloin Medallion",
+        "Chicken Kottu Roti Supreme",
+        "Belgian Berry & Banana Waffle",
+        "Grilled Atlantic Salmon Steak",
+        "Prime Beef Sirloin Medallion",
+        "Chicken Kottu Roti Supreme",
+        "Fresh Berry Smoothie Bowl",
+        "Grilled Atlantic Salmon Steak",
+        "Chicken Kottu Roti Supreme",
+        "Prime Beef Sirloin Medallion",
+        "Grilled Atlantic Salmon Steak",
+        "Chicken Kottu Roti Supreme"
+    ]
+
+    total_period_rev = 0.0
+    total_period_orders = 0
+
+    for i in range(days):
+        day_date = today - timedelta(days=i)
+        idx = i % len(base_orders)
+        
+        ord_count = base_orders[idx]
+        rev = base_revenues[idx]
+        total_period_rev += rev
+        total_period_orders += ord_count
+        
+        history.append({
+            "date": day_date.strftime("%Y-%m-%d"),
+            "formatted_date": day_date.strftime("%d %b %Y"),
+            "day_name": "Today" if i == 0 else "Yesterday" if i == 1 else day_date.strftime("%a"),
+            "total_orders": ord_count,
+            "revenue_lkr": rev,
+            "avg_order_value_lkr": round(rev / ord_count, 2),
+            "dine_in_orders": int(ord_count * 0.65),
+            "takeaway_orders": int(ord_count * 0.25),
+            "delivery_orders": int(ord_count * 0.10),
+            "top_selling_dish": top_dishes[idx],
+            "fifo_waste_saved_kg": round(ord_count * 0.072, 1),
+            "on_time_rate": "95.1%" if i % 2 == 0 else "93.8%"
+        })
+
+    return {
+        "days_requested": days,
+        "total_period_revenue_lkr": total_period_rev,
+        "total_period_orders": total_period_orders,
+        "avg_daily_revenue_lkr": round(total_period_rev / days, 2),
+        "history": history
+    }
+

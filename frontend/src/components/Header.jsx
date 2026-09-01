@@ -20,7 +20,8 @@ import {
   Crown,
   Armchair,
   Receipt,
-  Flame
+  Flame,
+  Utensils
 } from 'lucide-react';
 
 export const ROLES = [
@@ -28,28 +29,28 @@ export const ROLES = [
     id: 'admin',
     title: 'Admin (Full Access)',
     shortTitle: 'Admin',
-    description: 'Executive overview, AI models, inventory valuation, and research modules',
+    description: 'Executive overview, AI models, inventory valuation, and all research modules',
     icon: <Crown className="h-4 w-4 text-amber-500" />,
     badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
     defaultModule: 'executive'
   },
   {
     id: 'cashier',
-    title: 'Cashier (POS & Billing)',
+    title: 'Cashier (Front-of-House)',
     shortTitle: 'Cashier',
-    description: 'Front-of-House POS menu ordering, table floor map, and sales ledger',
+    description: 'POS menu ordering, live table map, and customer sales ledger',
     icon: <CreditCard className="h-4 w-4 text-emerald-500" />,
     badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
-    defaultModule: 'orders'
+    defaultModule: 'pos_menu'
   },
   {
     id: 'staff',
     title: 'Kitchen & Floor Staff',
     shortTitle: 'Kitchen Staff',
-    description: 'Live KDS cooking tickets, station line load, and cold storage restock',
+    description: 'Live KDS cooking tickets, line station loads, and cold storage restock',
     icon: <ChefHat className="h-4 w-4 text-blue-500" />,
     badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
-    defaultModule: 'orders'
+    defaultModule: 'kds'
   }
 ];
 
@@ -79,66 +80,125 @@ export default function Header({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ALL 7 MODULE DEFINITIONS
-  const allModules = [
-    { 
-      id: 'executive', 
-      label: 'Executive Hub', 
-      shortLabel: 'Executive', 
-      badge: 'Core',
-      roles: ['admin'],
-      icon: <Layers className="h-3.5 w-3.5" /> 
-    },
-    { 
-      id: 'orders', 
-      label: currentRole === 'staff' ? 'Kitchen Display (KDS)' : 'Orders & POS', 
-      shortLabel: currentRole === 'staff' ? 'KDS Tickets' : 'Orders & POS', 
-      badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
-      badgeColor: 'bg-blue-500',
-      roles: ['admin', 'cashier', 'staff'],
-      icon: currentRole === 'staff' ? <Flame className="h-3.5 w-3.5" /> : <ShoppingBag className="h-3.5 w-3.5" /> 
-    },
-    { 
-      id: 'inventory', 
-      label: 'Inventory & Stock', 
-      shortLabel: 'Inventory', 
-      roles: ['admin', 'staff'],
-      icon: <Package className="h-3.5 w-3.5" /> 
-    },
-    { 
-      id: 'spoilage', 
-      label: 'Food Spoilage & Quality', 
-      shortLabel: 'Food Spoilage', 
-      badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
-      badgeColor: 'bg-rose-500',
-      roles: ['admin', 'staff'],
-      icon: <Cpu className="h-3.5 w-3.5" /> 
-    },
-    { 
-      id: 'kitchen', 
-      label: 'Kitchen Stations & Staff', 
-      shortLabel: 'Kitchen Stations', 
-      roles: ['admin', 'staff'],
-      icon: <Users className="h-3.5 w-3.5" /> 
-    },
-    { 
-      id: 'demand', 
-      label: 'Demand Forecasting', 
-      shortLabel: 'Demand', 
-      roles: ['admin'],
-      icon: <TrendingUp className="h-3.5 w-3.5" /> 
-    },
-    { 
-      id: 'waste', 
-      label: 'Smart Waste Bin', 
-      shortLabel: 'Waste Bin', 
-      roles: ['admin', 'staff'],
-      icon: <Trash2 className="h-3.5 w-3.5" /> 
+  // ROLE-SPECIFIC DOCK MODULE DEFINITIONS (1 Screen = 1 Dedicated Purpose)
+  const getModulesForRole = () => {
+    if (currentRole === 'cashier') {
+      return [
+        {
+          id: 'pos_menu',
+          label: 'POS Menu Ordering',
+          shortLabel: 'POS Menu',
+          badge: 'Order',
+          badgeColor: 'bg-emerald-600',
+          icon: <Utensils className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'tables_map',
+          label: 'Restaurant Table Map',
+          shortLabel: 'Table Map',
+          icon: <Armchair className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'orders_ledger',
+          label: 'Orders & Sales Ledger',
+          shortLabel: 'Sales Ledger',
+          icon: <Receipt className="h-3.5 w-3.5" />
+        }
+      ];
     }
-  ];
 
-  // Filter modules visible for the active role
-  const visibleModules = allModules.filter(m => m.roles.includes(currentRole));
+    if (currentRole === 'staff') {
+      return [
+        {
+          id: 'kds',
+          label: 'Kitchen Display (KDS)',
+          shortLabel: 'KDS Tickets',
+          badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
+          badgeColor: 'bg-amber-500',
+          icon: <Flame className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'kitchen',
+          label: 'Kitchen Stations & Line',
+          shortLabel: 'Stations',
+          icon: <Users className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'inventory',
+          label: 'Perishable Inventory',
+          shortLabel: 'Inventory',
+          icon: <Package className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'spoilage',
+          label: 'Food Spoilage & Quality',
+          shortLabel: 'Spoilage',
+          badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
+          badgeColor: 'bg-rose-500',
+          icon: <Cpu className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'waste',
+          label: 'Smart Waste Bin',
+          shortLabel: 'Waste Bin',
+          icon: <Trash2 className="h-3.5 w-3.5" />
+        }
+      ];
+    }
+
+    // Default: Admin (Full Access to all 7 core modules)
+    return [
+      { 
+        id: 'executive', 
+        label: 'Executive Hub', 
+        shortLabel: 'Executive', 
+        badge: 'Core',
+        icon: <Layers className="h-3.5 w-3.5" /> 
+      },
+      { 
+        id: 'orders', 
+        label: 'Orders & POS', 
+        shortLabel: 'Orders', 
+        badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
+        badgeColor: 'bg-blue-500',
+        icon: <ShoppingBag className="h-3.5 w-3.5" /> 
+      },
+      { 
+        id: 'inventory', 
+        label: 'Inventory & Stock', 
+        shortLabel: 'Inventory', 
+        icon: <Package className="h-3.5 w-3.5" /> 
+      },
+      { 
+        id: 'spoilage', 
+        label: 'Food Spoilage & Quality', 
+        shortLabel: 'Food Spoilage', 
+        badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
+        badgeColor: 'bg-rose-500',
+        icon: <Cpu className="h-3.5 w-3.5" /> 
+      },
+      { 
+        id: 'kitchen', 
+        label: 'Kitchen & Staff', 
+        shortLabel: 'Kitchen', 
+        icon: <Users className="h-3.5 w-3.5" /> 
+      },
+      { 
+        id: 'demand', 
+        label: 'Demand Forecasting', 
+        shortLabel: 'Demand', 
+        icon: <TrendingUp className="h-3.5 w-3.5" /> 
+      },
+      { 
+        id: 'waste', 
+        label: 'Smart Waste Bin', 
+        shortLabel: 'Waste Bin', 
+        icon: <Trash2 className="h-3.5 w-3.5" /> 
+      }
+    ];
+  };
+
+  const visibleModules = getModulesForRole();
   const activeRoleObj = ROLES.find(r => r.id === currentRole) || ROLES[0];
 
   const handleRoleSwitch = (role) => {
@@ -146,11 +206,7 @@ export default function Header({
       onSelectRole(role.id);
     }
     setRoleDropdownOpen(false);
-    // Switch active module to role default if current is not in the new role
-    const isModuleAllowed = allModules.find(m => m.id === activeModule)?.roles.includes(role.id);
-    if (!isModuleAllowed) {
-      onSelectModule(role.defaultModule);
-    }
+    onSelectModule(role.defaultModule);
   };
 
   return (
