@@ -332,7 +332,7 @@ export default function App() {
 
         {/* Module 5: Kitchen & Staff */}
         {activeModule === 'kitchen' && (
-          <KitchenStaffDashboard isDarkMode={isDarkMode} />
+          <KitchenStaffDashboard isDarkMode={isDarkMode} currentRole={currentRole} />
         )}
 
         {/* Module 6: Demand Prediction */}

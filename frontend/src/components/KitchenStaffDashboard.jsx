@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Clock, Flame, Award, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2, TrendingUp, Utensils, X, Lock, LogIn, Key, Smartphone, Coffee, ChefHat, Send, CheckSquare, Pizza, Plus, Minus, Hash, Search } from 'lucide-react';
+import { Users, Clock, Flame, Award, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2, TrendingUp, Utensils, X, Lock, LogIn, Key, Smartphone, Coffee, ChefHat, Send, CheckSquare, Pizza, Plus, Minus, Hash, Search, Layers } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ReferenceArea } from 'recharts';
 import axios from 'axios';
 
-export default function KitchenStaffDashboard({ isDarkMode }) {
+export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin' }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeRoleView, setActiveRoleView] = useState(currentRole === 'staff' ? 'staff_view' : 'all');
+
+  useEffect(() => {
+    if (currentRole === 'staff') {
+      setActiveRoleView('staff_view');
+    } else {
+      setActiveRoleView('all');
+    }
+  }, [currentRole]);
+
   const [showSeasonalRush, setShowSeasonalRush] = useState(true);
   const [showLunchRush, setShowLunchRush] = useState(true);
   const [showBreakfastRush, setShowBreakfastRush] = useState(true);
@@ -179,7 +189,7 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
     { id: "sl-2", name: "Chicken Kottu", category: "Sri Lankan", station: "Cooking Station", icon: "🍳", checked: true, size: "Medium", qty: 1, defaultStaff: "S. Fernando (Junior Chef)" },
     { id: "sl-3", name: "Cheese Kottu Special", category: "Sri Lankan", station: "Cooking Station", icon: "🍳", checked: false, size: "Large", qty: 1, defaultStaff: "K. Perera (Senior Line Chef)" },
     { id: "sl-4", name: "Sri Lankan Fish Curry & Rice", category: "Sri Lankan", station: "Curry & Rice Assembly Bay", icon: "🍲", checked: false, size: "Regular", qty: 1, defaultStaff: "A. Jayasinghe (Station Lead)" },
-    
+
     // Pizza Variety
     { id: "pz-1", name: "Devilled Chicken Pizza", category: "Pizza", station: "Cooking Station", icon: "🍕", checked: true, size: "Large (15\")", qty: 1, defaultStaff: "S. Fernando (Junior Chef)" },
     { id: "pz-2", name: "BBQ Chicken Pizza", category: "Pizza", station: "Cooking Station", icon: "🍕", checked: false, size: "Medium (12\")", qty: 1, defaultStaff: "K. Perera (Senior Line Chef)" },
@@ -301,8 +311,8 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
             recommended_cooks: targetCooks,
             load_level: newLoad,
             bottleneck_status: newLoad >= 85 ? "Critical Queue Surge" : (newLoad >= 70 ? "High Delay Risk" : "Smooth Flow"),
-            action: newLoad >= 80 
-              ? "Reallocate S. Fernando from Salad & Cold Prep Station to Hot Wok & Kottu Station based on skill matching" 
+            action: newLoad >= 80
+              ? "Reallocate S. Fernando from Salad & Cold Prep Station to Hot Wok & Kottu Station based on skill matching"
               : "Maintain current line pacing"
           };
         }
@@ -319,7 +329,7 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
             recommended_cooks: targetCooks,
             load_level: newLoad,
             bottleneck_status: newLoad >= 80 ? "High Delay Risk" : "Smooth Flow",
-            action: newLoad >= 80 
+            action: newLoad >= 80
               ? "Reallocate T. Silva to Grill & Seafood Station & prep protein cuts based on skill matching"
               : "Maintain current line staffing"
           };
@@ -441,9 +451,9 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
     }
 
     const query = loginStaffInput.trim().toLowerCase();
-    const member = data.staff.find(s => 
-      s.id.toLowerCase() === query || 
-      s.name.toLowerCase().includes(query) || 
+    const member = data.staff.find(s =>
+      s.id.toLowerCase() === query ||
+      s.name.toLowerCase().includes(query) ||
       query.includes(s.name.toLowerCase())
     ) || data.staff[0];
 
@@ -563,9 +573,68 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
 
   return (
     <div className="space-y-6">
-      
+
+      {/* Role Navigation Bar */}
+      <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {currentRole === 'admin' && (
+            <button
+              onClick={() => setActiveRoleView('all')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'all'
+                  ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
+                }`}
+            >
+              <Layers className="h-3.5 w-3.5" /> All Views (Admin Full Suite)
+            </button>
+          )}
+
+          <button
+            onClick={() => setActiveRoleView('staff_view')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'staff_view'
+                ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
+              }`}
+          >
+            <Utensils className="h-3.5 w-3.5" /> 🍳 Kitchen Staff Station View
+          </button>
+
+          {currentRole === 'admin' && (
+            <button
+              onClick={() => setActiveRoleView('admin_analytics')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'admin_analytics'
+                  ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
+                }`}
+            >
+              <TrendingUp className="h-3.5 w-3.5" /> 📊 Executive Analytics & Staffing AI
+            </button>
+          )}
+
+          <button
+            onClick={() => setActiveRoleView('skill_matrix')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${activeRoleView === 'skill_matrix'
+                ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700'
+              }`}
+          >
+            <Award className="h-3.5 w-3.5" /> 🎓 Staff Skill Matrix & Self-Assessment
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+          <span>Active Role:</span>
+          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${currentRole === 'admin'
+              ? 'bg-purple-100 text-purple-800 border border-purple-300 dark:bg-purple-950 dark:text-purple-300'
+              : 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300'
+            }`}>
+            {currentRole === 'admin' ? '🛡️ Executive Admin' : '👨‍🍳 Kitchen Staff'}
+          </span>
+        </div>
+      </div>
+
       {/* Critical Efficiency Alert Banner (< 50%) */}
-      {isCriticalEfficiency && (
+      {isCriticalEfficiency && (activeRoleView === 'all' || activeRoleView === 'admin_analytics') && (
         <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-500 dark:bg-rose-950/60 dark:border-rose-500/80 text-rose-950 dark:text-rose-100 shadow-xl flex items-center justify-between gap-4 animate-pulse">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-rose-600 text-white font-bold flex-shrink-0 shadow-md">
@@ -588,179 +657,179 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
         </div>
       )}
 
-      {/* Top Banner */}
-      <div className="glass-panel p-6 rounded-2xl space-y-5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Kitchen Efficiency & Dynamic Staff Optimization</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 font-bold">
-                Workflow & Bottleneck AI
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Real-time line bottleneck monitoring, peak-hour staff allocation, and staff progression
-            </p>
-          </div>
-
-          <div className="flex flex-col items-end gap-1.5">
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Kitchen Overall Efficiency</span>
-                <div className={`text-xl font-black ${isCriticalEfficiency ? 'text-rose-600 dark:text-rose-400 animate-pulse' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                  {shiftEfficiency}
-                </div>
-              </div>
-              <div className="text-right border-l border-slate-200 dark:border-slate-800 pl-4">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Avg Prep Time</span>
-                <div className="text-xl font-black text-slate-900 dark:text-white">{shiftPrepTime}</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
-              <Clock className="h-3 w-3 text-orange-500" />
-              <span>⏰ Auto-updates every 4 hours • {last4HourUpdate}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Toast Notification */}
-        {dismissedToast && (
-          <div className="p-3.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-lg flex items-center justify-between gap-2 animate-bounce">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              <span>{dismissedToast}</span>
-            </div>
-            <button onClick={() => setDismissedToast("")} className="text-white hover:text-slate-200 text-xs font-black cursor-pointer">✕</button>
-          </div>
-        )}
-
-        {/* AI Actionable Directives (Real-Time Dynamic Queue) */}
-        <div className="p-5 rounded-2xl bg-orange-50 border border-orange-200 dark:bg-orange-950/40 dark:border-orange-500/30 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-orange-200 dark:border-orange-800/60 pb-3">
-            <div className="flex items-center gap-2">
-              <Flame className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
-              <div>
-                <h3 className="text-xs font-black text-orange-900 dark:text-orange-200 uppercase tracking-wider">
-                  AI Dynamic Staff Allocation Directives
-                </h3>
-                <p className="text-[11px] text-orange-800 dark:text-orange-300 font-medium">
-                  Updates dynamically based on real-time order queue bottlenecks and staff skill matching
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span> Live Kitchen Engine
-              </span>
-              <button
-                onClick={handleSimulateSurge}
-                className="px-3 py-1 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                title="Simulate sudden order queue spike"
-              >
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>Simulate Order Queue Surge</span>
-              </button>
-            </div>
-          </div>
-
-          {directives.length === 0 ? (
-            <div className="p-4 rounded-xl bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 text-xs font-bold flex items-center justify-between">
+      {/* Top Banner (Admin & Analytics View) */}
+      {(activeRoleView === 'all' || activeRoleView === 'admin_analytics') && (
+        <div className="glass-panel p-6 rounded-2xl space-y-5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+            <div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                <span>All line bottlenecks resolved! Kitchen staffing operating at optimal efficiency.</span>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Kitchen Efficiency & Dynamic Staff Optimization</h2>
+                <span className="text-xs px-2.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 font-bold">
+                  Workflow & Bottleneck AI
+                </span>
               </div>
-              <button
-                onClick={() => {
-                  setDirectives([
-                    {
-                      id: `dir-${Date.now()}-1`,
-                      stationId: "station-1",
-                      priority: "CRITICAL",
-                      title: "⚠️ DINNER RUSH ALERT: Station 1 (Hot Wok) requires +1 Cook at 7:00 PM due to 115 projected orders.",
-                      actionText: "Reallocate S. Fernando from Cold Prep to Hot Wok Station based on skill matching",
-                      targetStaff: "S. Fernando",
-                      targetStation: "Hot Wok & Kottu Station",
-                      mitigatedLoad: 55,
-                      mitigatedQueue: 4,
-                      resolved: false
-                    },
-                    {
-                      id: `dir-${Date.now()}-2`,
-                      stationId: "station-3",
-                      priority: "HIGH",
-                      title: "🔥 GRILL BOTTLENECK ALERT: Grill & Seafood Station prep latency spiked to 14.0 mins.",
-                      actionText: "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching",
-                      targetStaff: "T. Silva",
-                      targetStation: "Grill & Seafood Station",
-                      mitigatedLoad: 48,
-                      mitigatedQueue: 3,
-                      resolved: false
-                    }
-                  ]);
-                }}
-                className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[11px] hover:bg-emerald-700 transition-colors cursor-pointer"
-              >
-                Reset Directives
-              </button>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                Real-time line bottleneck monitoring, peak-hour staff allocation, and staff progression
+              </p>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {directives.map((dir, index) => (
-                <div
-                  key={dir.id}
-                  className={`p-3.5 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                    dir.resolved
-                      ? 'bg-emerald-50 border-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800 opacity-60'
-                      : (index === 0
-                          ? 'bg-white dark:bg-slate-900 border-2 border-orange-400 dark:border-orange-500/60 shadow-sm'
-                          : 'bg-white/80 dark:bg-slate-900/60 border-orange-200 dark:border-orange-900/40 opacity-85')
-                  }`}
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-md text-white ${
-                        dir.priority.includes('SURGE') || dir.priority === 'CRITICAL'
-                          ? 'bg-rose-600 animate-pulse'
-                          : (dir.priority === 'HIGH' ? 'bg-amber-600' : 'bg-blue-600')
-                      }`}>
-                        {index === 0 ? `TOP PRIORITY: ${dir.priority}` : `PRIORITY ${index + 1}: ${dir.priority}`}
-                      </span>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white">{dir.title}</p>
-                    </div>
-                    <p className="text-xs text-orange-950 dark:text-orange-200 font-semibold flex items-center gap-1 pt-0.5">
-                      <ArrowRight className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
-                      <span>Action: <span className="font-extrabold text-orange-900 dark:text-orange-100 underline">{dir.actionText}</span></span>
-                    </p>
-                  </div>
 
-                  {dir.resolved ? (
-                    <span className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center gap-1 whitespace-nowrap self-start sm:self-auto">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Reassigned & Resolved</span>
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleExecuteDirective(dir)}
-                      className={`px-3.5 py-2 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap self-start sm:self-auto ${
-                        index === 0
-                          ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-600/30 ring-2 ring-orange-400'
-                          : 'bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600'
-                      }`}
-                    >
-                      <ShieldCheck className="h-4 w-4" />
-                      <span>Reallocate {dir.targetStaff}</span>
-                    </button>
-                  )}
+            <div className="flex flex-col items-end gap-1.5">
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Kitchen Overall Efficiency</span>
+                  <div className={`text-xl font-black ${isCriticalEfficiency ? 'text-rose-600 dark:text-rose-400 animate-pulse' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                    {shiftEfficiency}
+                  </div>
                 </div>
-              ))}
+                <div className="text-right border-l border-slate-200 dark:border-slate-800 pl-4">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Avg Prep Time</span>
+                  <div className="text-xl font-black text-slate-900 dark:text-white">{shiftPrepTime}</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
+                <Clock className="h-3 w-3 text-orange-500" />
+                <span>⏰ Auto-updates every 4 hours • {last4HourUpdate}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Toast Notification */}
+          {dismissedToast && (
+            <div className="p-3.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-lg flex items-center justify-between gap-2 animate-bounce">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                <span>{dismissedToast}</span>
+              </div>
+              <button onClick={() => setDismissedToast("")} className="text-white hover:text-slate-200 text-xs font-black cursor-pointer">✕</button>
             </div>
           )}
-        </div>
-      </div>
 
-        {/* Real-Time Mobile Order Dispatch & Station Task Routing Section */}
+          {/* AI Actionable Directives (Real-Time Dynamic Queue) */}
+          <div className="p-5 rounded-2xl bg-orange-50 border border-orange-200 dark:bg-orange-950/40 dark:border-orange-500/30 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-orange-200 dark:border-orange-800/60 pb-3">
+              <div className="flex items-center gap-2">
+                <Flame className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xs font-black text-orange-900 dark:text-orange-200 uppercase tracking-wider">
+                    AI Dynamic Staff Allocation Directives
+                  </h3>
+                  <p className="text-[11px] text-orange-800 dark:text-orange-300 font-medium">
+                    Updates dynamically based on real-time order queue bottlenecks and staff skill matching
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span> Live Kitchen Engine
+                </span>
+                <button
+                  onClick={handleSimulateSurge}
+                  className="px-3 py-1 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                  title="Simulate sudden order queue spike"
+                >
+                  <TrendingUp className="h-3.5 w-3.5" />
+                  <span>Simulate Order Queue Surge</span>
+                </button>
+              </div>
+            </div>
+
+            {directives.length === 0 ? (
+              <div className="p-4 rounded-xl bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 text-xs font-bold flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  <span>All line bottlenecks resolved! Kitchen staffing operating at optimal efficiency.</span>
+                </div>
+                <button
+                  onClick={() => {
+                    setDirectives([
+                      {
+                        id: `dir-${Date.now()}-1`,
+                        stationId: "station-1",
+                        priority: "CRITICAL",
+                        title: "⚠️ DINNER RUSH ALERT: Station 1 (Hot Wok) requires +1 Cook at 7:00 PM due to 115 projected orders.",
+                        actionText: "Reallocate S. Fernando from Cold Prep to Hot Wok Station based on skill matching",
+                        targetStaff: "S. Fernando",
+                        targetStation: "Hot Wok & Kottu Station",
+                        mitigatedLoad: 55,
+                        mitigatedQueue: 4,
+                        resolved: false
+                      },
+                      {
+                        id: `dir-${Date.now()}-2`,
+                        stationId: "station-3",
+                        priority: "HIGH",
+                        title: "🔥 GRILL BOTTLENECK ALERT: Grill & Seafood Station prep latency spiked to 14.0 mins.",
+                        actionText: "Reallocate T. Silva to Grill Station & prep protein cuts based on skill matching",
+                        targetStaff: "T. Silva",
+                        targetStation: "Grill & Seafood Station",
+                        mitigatedLoad: 48,
+                        mitigatedQueue: 3,
+                        resolved: false
+                      }
+                    ]);
+                  }}
+                  className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[11px] hover:bg-emerald-700 transition-colors cursor-pointer"
+                >
+                  Reset Directives
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {directives.map((dir, index) => (
+                  <div
+                    key={dir.id}
+                    className={`p-3.5 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${dir.resolved
+                        ? 'bg-emerald-50 border-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800 opacity-60'
+                        : (index === 0
+                          ? 'bg-white dark:bg-slate-900 border-2 border-orange-400 dark:border-orange-500/60 shadow-sm'
+                          : 'bg-white/80 dark:bg-slate-900/60 border-orange-200 dark:border-orange-900/40 opacity-85')
+                      }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-md text-white ${dir.priority.includes('SURGE') || dir.priority === 'CRITICAL'
+                            ? 'bg-rose-600 animate-pulse'
+                            : (dir.priority === 'HIGH' ? 'bg-amber-600' : 'bg-blue-600')
+                          }`}>
+                          {index === 0 ? `TOP PRIORITY: ${dir.priority}` : `PRIORITY ${index + 1}: ${dir.priority}`}
+                        </span>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">{dir.title}</p>
+                      </div>
+                      <p className="text-xs text-orange-950 dark:text-orange-200 font-semibold flex items-center gap-1 pt-0.5">
+                        <ArrowRight className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                        <span>Action: <span className="font-extrabold text-orange-900 dark:text-orange-100 underline">{dir.actionText}</span></span>
+                      </p>
+                    </div>
+
+                    {dir.resolved ? (
+                      <span className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center gap-1 whitespace-nowrap self-start sm:self-auto">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span>Reassigned & Resolved</span>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleExecuteDirective(dir)}
+                        className={`px-3.5 py-2 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap self-start sm:self-auto ${index === 0
+                            ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-600/30 ring-2 ring-orange-400'
+                            : 'bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600'
+                          }`}
+                      >
+                        <ShieldCheck className="h-4 w-4" />
+                        <span>Reallocate {dir.targetStaff}</span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Real-Time Mobile Order Dispatch & Station Task Routing Section (Kitchen Staff & All Views) */}
+      {(activeRoleView === 'all' || activeRoleView === 'staff_view') && (
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
             <div>
@@ -807,11 +876,10 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                      ord.priority.includes("Rush") || ord.priority.includes("VIP")
+                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${ord.priority.includes("Rush") || ord.priority.includes("VIP")
                         ? "bg-rose-600 text-white animate-pulse"
                         : "bg-emerald-600 text-white"
-                    }`}>
+                      }`}>
                       🔴 Priority: {ord.priority}
                     </span>
                     <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 flex items-center gap-1">
@@ -964,241 +1032,240 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
             ))}
           </div>
         </div>
+      )}
 
-      {/* Peak-Hour Workload & Staffing Demand Chart */}
-      <div className="glass-panel p-6 rounded-2xl space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Peak-Hour Workload & Staffing Forecast (07:00 - 22:30)</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Hourly projected kitchen orders and dynamic cook allocation requirements</p>
+      {/* Peak-Hour Workload & Staffing Demand Chart (Admin & Analytics Views) */}
+      {(activeRoleView === 'all' || activeRoleView === 'admin_analytics') && (
+        <div className="glass-panel p-6 rounded-2xl space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Peak-Hour Workload & Staffing Forecast (07:00 - 22:30)</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Hourly projected kitchen orders and dynamic cook allocation requirements</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                onClick={() => setShowBreakfastRush(!showBreakfastRush)}
+                className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${showBreakfastRush
+                    ? 'bg-amber-600 text-white border-amber-600 shadow-amber-500/30'
+                    : 'text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+                  }`}
+              >
+                <Clock className="h-3.5 w-3.5" />
+                <span>Breakfast Rush: 07:30 – 09:30</span>
+              </button>
+              <button
+                onClick={() => setShowLunchRush(!showLunchRush)}
+                className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${showLunchRush
+                    ? 'bg-sky-600 text-white border-sky-600 shadow-sky-500/30'
+                    : 'text-sky-800 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/20 hover:bg-sky-100 dark:hover:bg-sky-500/20'
+                  }`}
+              >
+                <Utensils className="h-3.5 w-3.5" />
+                <span>Lunch Rush: 12:00 – 14:00</span>
+              </button>
+              <button
+                onClick={() => setShowDinnerRush(!showDinnerRush)}
+                className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${showDinnerRush
+                    ? 'bg-orange-600 text-white border-orange-600 shadow-orange-500/30'
+                    : 'text-orange-800 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/20 hover:bg-orange-100 dark:hover:bg-orange-500/20'
+                  }`}
+              >
+                <Flame className="h-3.5 w-3.5" />
+                <span>Dinner Rush: 19:00 – 20:30</span>
+              </button>
+              <button
+                onClick={() => setShowSeasonalRush(!showSeasonalRush)}
+                className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${showSeasonalRush
+                    ? 'bg-purple-600 text-white border-purple-600 shadow-purple-500/30'
+                    : 'text-purple-800 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20'
+                  }`}
+              >
+                <TrendingUp className="h-3.5 w-3.5" />
+                <span>Seasonal Rush</span>
+              </button>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            <button
-              onClick={() => setShowBreakfastRush(!showBreakfastRush)}
-              className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${
-                showBreakfastRush
-                  ? 'bg-amber-600 text-white border-amber-600 shadow-amber-500/30'
-                  : 'text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20'
-              }`}
-            >
-              <Clock className="h-3.5 w-3.5" />
-              <span>Breakfast Rush: 07:30 – 09:30</span>
-            </button>
-            <button
-              onClick={() => setShowLunchRush(!showLunchRush)}
-              className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${
-                showLunchRush
-                  ? 'bg-sky-600 text-white border-sky-600 shadow-sky-500/30'
-                  : 'text-sky-800 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/20 hover:bg-sky-100 dark:hover:bg-sky-500/20'
-              }`}
-            >
-              <Utensils className="h-3.5 w-3.5" />
-              <span>Lunch Rush: 12:00 – 14:00</span>
-            </button>
-            <button
-              onClick={() => setShowDinnerRush(!showDinnerRush)}
-              className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${
-                showDinnerRush
-                  ? 'bg-orange-600 text-white border-orange-600 shadow-orange-500/30'
-                  : 'text-orange-800 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/20 hover:bg-orange-100 dark:hover:bg-orange-500/20'
-              }`}
-            >
-              <Flame className="h-3.5 w-3.5" />
-              <span>Dinner Rush: 19:00 – 20:30</span>
-            </button>
-            <button
-              onClick={() => setShowSeasonalRush(!showSeasonalRush)}
-              className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-1 ${
-                showSeasonalRush
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-purple-500/30'
-                  : 'text-purple-800 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20'
-              }`}
-            >
-              <TrendingUp className="h-3.5 w-3.5" />
-              <span>Seasonal Rush</span>
-            </button>
+
+          {/* Breakfast Rush Period Section */}
+          {showBreakfastRush && (
+            <div className="p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-500/30 shadow-sm space-y-3 mt-3">
+              <div className="flex items-center justify-between border-b border-amber-200 dark:border-amber-800/50 pb-2">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-200">Breakfast Rush Period Details</h4>
+                </div>
+                <span className="text-[11px] font-extrabold text-amber-700 dark:text-amber-300 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                  Peak: 76 Orders/Hr at 08:00
+                </span>
+              </div>
+              <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-amber-100 dark:border-amber-900/50 shadow-2xs">
+                  <span className="font-bold text-amber-950 dark:text-amber-200">Breakfast Rush Window:</span> 07:30 AM – 09:30 AM (Morning takeaway & breakfast dining surge)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-amber-100 dark:border-amber-900/50 shadow-2xs">
+                  <span className="font-bold text-amber-900 dark:text-amber-300">Staff Allocation Required:</span> 6 Line Chefs (2 Hoppers/Roti Bay, 2 Beverage Station, 2 Assembly)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-amber-100 dark:border-amber-900/50 shadow-2xs">
+                  <span className="font-bold text-amber-900 dark:text-amber-300">Menu Demand Focus:</span> String Hoppers, Egg Hoppers, Pol Roti with Lunu Miris, Ceylon Tea & Coffee
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Lunch Rush Period Section */}
+          {showLunchRush && (
+            <div className="p-4 rounded-xl bg-sky-50/80 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-500/30 shadow-sm space-y-3 mt-3">
+              <div className="flex items-center justify-between border-b border-sky-200 dark:border-sky-800/50 pb-2">
+                <div className="flex items-center gap-2">
+                  <Utensils className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-sky-900 dark:text-sky-200">Lunch Rush Period Details</h4>
+                </div>
+                <span className="text-[11px] font-extrabold text-sky-700 dark:text-sky-300 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
+                  Peak: 95 Orders/Hr at 13:00
+                </span>
+              </div>
+              <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-sky-100 dark:border-sky-900/50 shadow-2xs">
+                  <span className="font-bold text-sky-950 dark:text-sky-200">Lunch Rush Window:</span> 12:00 PM – 02:00 PM (Highest daily dine-in & corporate rush)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-sky-100 dark:border-sky-900/50 shadow-2xs">
+                  <span className="font-bold text-sky-900 dark:text-sky-300">Staff Allocation Required:</span> 8 Line Chefs (2 Wok, 2 Curry Bay, 2 Grill, 2 Assembly)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-sky-100 dark:border-sky-900/50 shadow-2xs">
+                  <span className="font-bold text-sky-900 dark:text-sky-300">Menu Demand Focus:</span> Rice & Curry Express Thali, Wok Fried Rice & Seafood Combos
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Dinner Rush Period Section */}
+          {showDinnerRush && (
+            <div className="p-4 rounded-xl bg-orange-50/80 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-500/30 shadow-sm space-y-3 mt-3">
+              <div className="flex items-center justify-between border-b border-orange-200 dark:border-orange-800/50 pb-2">
+                <div className="flex items-center gap-2">
+                  <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-orange-900 dark:text-orange-200">Dinner Rush Period Details</h4>
+                </div>
+                <span className="text-[11px] font-extrabold text-orange-700 dark:text-orange-300 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-800">
+                  Peak: 115 Orders/Hr at 19:00
+                </span>
+              </div>
+              <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900/50 shadow-2xs">
+                  <span className="font-bold text-orange-950 dark:text-orange-200">Dinner Rush Window:</span> 07:00 PM – 08:30 PM (Highest daily revenue & family dining surge)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900/50 shadow-2xs">
+                  <span className="font-bold text-orange-900 dark:text-orange-300">Staff Allocation Required:</span> 9 Line Chefs (3 Wok, 2 Curry Bay, 2 Grill & Seafood, 2 Delivery Prep)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900/50 shadow-2xs">
+                  <span className="font-bold text-orange-900 dark:text-orange-300">Menu Demand Focus:</span> Cheese Kottu Specials, Jumbo Seafood Fried Rice, Grilled Meats & Desserts
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Seasonal Rush Periods Section */}
+          {showSeasonalRush && (
+            <div className="p-4 rounded-xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-500/30 shadow-sm space-y-3 mt-3">
+              <div className="flex items-center gap-2 border-b border-purple-200 dark:border-purple-800/50 pb-2">
+                <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-purple-900 dark:text-purple-200">Seasonal Rush Periods</h4>
+              </div>
+              <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-purple-100 dark:border-purple-900/50 shadow-2xs">
+                  <span className="font-bold text-purple-950 dark:text-purple-200">Festive / Holiday Season:</span> December – Early January (Christmas / New Year rush)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-purple-100 dark:border-purple-900/50 shadow-2xs">
+                  <span className="font-bold text-amber-900 dark:text-amber-300">New Year / Spring Festival:</span> Mid-April (Sinhala & Tamil New Year season)
+                </div>
+                <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-purple-100 dark:border-purple-900/50 shadow-2xs">
+                  <span className="font-bold text-sky-900 dark:text-sky-300">Summer / Tourist Peak Season:</span> July – August (Travel & vacation rush)
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data.hourly_peak_forecast}>
+                <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#1e293b" : "#e2e8f0"} />
+                <XAxis dataKey="hour" stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} />
+                <YAxis stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} yAxisId="left" />
+                <YAxis stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} yAxisId="right" orientation="right" domain={[0, 12]} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+                    borderColor: isDarkMode ? '#334155' : '#cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: isDarkMode ? '#f8fafc' : '#0f172a',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+
+                {/* Highlighted Breakfast Section on Diagram */}
+                <ReferenceArea
+                  yAxisId="left"
+                  x1="07:00"
+                  x2="09:00"
+                  fill={isDarkMode ? "#d97706" : "#f59e0b"}
+                  fillOpacity={isDarkMode ? 0.2 : 0.12}
+                  stroke="#d97706"
+                  strokeDasharray="3 3"
+                  label={{
+                    value: "Breakfast Rush (07:30 – 09:30)",
+                    fill: isDarkMode ? "#fbbf24" : "#d97706",
+                    fontSize: 11,
+                    fontWeight: "bold",
+                    position: "insideTop"
+                  }}
+                />
+
+                {/* Highlighted Lunch Section on Diagram */}
+                <ReferenceArea
+                  yAxisId="left"
+                  x1="12:00"
+                  x2="14:00"
+                  fill={isDarkMode ? "#0284c7" : "#0284c7"}
+                  fillOpacity={isDarkMode ? 0.2 : 0.12}
+                  stroke="#0284c7"
+                  strokeDasharray="3 3"
+                  label={{
+                    value: "Lunch Rush (12:00 – 14:00)",
+                    fill: isDarkMode ? "#38bdf8" : "#0284c7",
+                    fontSize: 11,
+                    fontWeight: "bold",
+                    position: "insideTop"
+                  }}
+                />
+
+                {/* Highlighted Dinner Section on Diagram */}
+                <ReferenceArea
+                  yAxisId="left"
+                  x1="18:00"
+                  x2="21:00"
+                  fill={isDarkMode ? "#ea580c" : "#f97316"}
+                  fillOpacity={isDarkMode ? 0.2 : 0.12}
+                  stroke="#f97316"
+                  strokeDasharray="3 3"
+                  label={{
+                    value: "Dinner Rush (19:00 – 20:30)",
+                    fill: isDarkMode ? "#fb923c" : "#ea580c",
+                    fontSize: 11,
+                    fontWeight: "bold",
+                    position: "insideTop"
+                  }}
+                />
+
+                <Line yAxisId="left" type="monotone" dataKey="predicted_orders" stroke="#f97316" strokeWidth={3} name="Predicted Orders" dot={{ r: 3 }} />
+                <Line yAxisId="right" type="stepAfter" dataKey="staff_required" stroke="#10b981" strokeWidth={2.5} name="Chefs Required" />
+                <Line yAxisId="right" type="stepAfter" dataKey="actual_staff" stroke="#64748b" strokeWidth={2} strokeDasharray="4 4" name="Scheduled Chefs" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
-
-        {/* Breakfast Rush Period Section */}
-        {showBreakfastRush && (
-          <div className="p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-500/30 shadow-sm space-y-3 mt-3">
-            <div className="flex items-center justify-between border-b border-amber-200 dark:border-amber-800/50 pb-2">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-200">Breakfast Rush Period Details</h4>
-              </div>
-              <span className="text-[11px] font-extrabold text-amber-700 dark:text-amber-300 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
-                Peak: 76 Orders/Hr at 08:00
-              </span>
-            </div>
-            <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-amber-100 dark:border-amber-900/50 shadow-2xs">
-                <span className="font-bold text-amber-950 dark:text-amber-200">Breakfast Rush Window:</span> 07:30 AM – 09:30 AM (Morning takeaway & breakfast dining surge)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-amber-100 dark:border-amber-900/50 shadow-2xs">
-                <span className="font-bold text-amber-900 dark:text-amber-300">Staff Allocation Required:</span> 6 Line Chefs (2 Hoppers/Roti Bay, 2 Beverage Station, 2 Assembly)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-amber-100 dark:border-amber-900/50 shadow-2xs">
-                <span className="font-bold text-amber-900 dark:text-amber-300">Menu Demand Focus:</span> String Hoppers, Egg Hoppers, Pol Roti with Lunu Miris, Ceylon Tea & Coffee
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Lunch Rush Period Section */}
-        {showLunchRush && (
-          <div className="p-4 rounded-xl bg-sky-50/80 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-500/30 shadow-sm space-y-3 mt-3">
-            <div className="flex items-center justify-between border-b border-sky-200 dark:border-sky-800/50 pb-2">
-              <div className="flex items-center gap-2">
-                <Utensils className="h-4 w-4 text-sky-600 dark:text-sky-400" />
-                <h4 className="text-xs font-bold uppercase tracking-wider text-sky-900 dark:text-sky-200">Lunch Rush Period Details</h4>
-              </div>
-              <span className="text-[11px] font-extrabold text-sky-700 dark:text-sky-300 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
-                Peak: 95 Orders/Hr at 13:00
-              </span>
-            </div>
-            <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-sky-100 dark:border-sky-900/50 shadow-2xs">
-                <span className="font-bold text-sky-950 dark:text-sky-200">Lunch Rush Window:</span> 12:00 PM – 02:00 PM (Highest daily dine-in & corporate rush)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-sky-100 dark:border-sky-900/50 shadow-2xs">
-                <span className="font-bold text-sky-900 dark:text-sky-300">Staff Allocation Required:</span> 8 Line Chefs (2 Wok, 2 Curry Bay, 2 Grill, 2 Assembly)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-sky-100 dark:border-sky-900/50 shadow-2xs">
-                <span className="font-bold text-sky-900 dark:text-sky-300">Menu Demand Focus:</span> Rice & Curry Express Thali, Wok Fried Rice & Seafood Combos
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Dinner Rush Period Section */}
-        {showDinnerRush && (
-          <div className="p-4 rounded-xl bg-orange-50/80 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-500/30 shadow-sm space-y-3 mt-3">
-            <div className="flex items-center justify-between border-b border-orange-200 dark:border-orange-800/50 pb-2">
-              <div className="flex items-center gap-2">
-                <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                <h4 className="text-xs font-bold uppercase tracking-wider text-orange-900 dark:text-orange-200">Dinner Rush Period Details</h4>
-              </div>
-              <span className="text-[11px] font-extrabold text-orange-700 dark:text-orange-300 bg-white dark:bg-slate-900 px-2.5 py-0.5 rounded-full border border-orange-200 dark:border-orange-800">
-                Peak: 115 Orders/Hr at 19:00
-              </span>
-            </div>
-            <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900/50 shadow-2xs">
-                <span className="font-bold text-orange-950 dark:text-orange-200">Dinner Rush Window:</span> 07:00 PM – 08:30 PM (Highest daily revenue & family dining surge)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900/50 shadow-2xs">
-                <span className="font-bold text-orange-900 dark:text-orange-300">Staff Allocation Required:</span> 9 Line Chefs (3 Wok, 2 Curry Bay, 2 Grill & Seafood, 2 Delivery Prep)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900/50 shadow-2xs">
-                <span className="font-bold text-orange-900 dark:text-orange-300">Menu Demand Focus:</span> Cheese Kottu Specials, Jumbo Seafood Fried Rice, Grilled Meats & Desserts
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Seasonal Rush Periods Section */}
-        {showSeasonalRush && (
-          <div className="p-4 rounded-xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-500/30 shadow-sm space-y-3 mt-3">
-            <div className="flex items-center gap-2 border-b border-purple-200 dark:border-purple-800/50 pb-2">
-              <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-purple-900 dark:text-purple-200">Seasonal Rush Periods</h4>
-            </div>
-            <div className="space-y-2 text-xs text-slate-800 dark:text-slate-200 font-medium">
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-purple-100 dark:border-purple-900/50 shadow-2xs">
-                <span className="font-bold text-purple-950 dark:text-purple-200">Festive / Holiday Season:</span> December – Early January (Christmas / New Year rush)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-purple-100 dark:border-purple-900/50 shadow-2xs">
-                <span className="font-bold text-amber-900 dark:text-amber-300">New Year / Spring Festival:</span> Mid-April (Sinhala & Tamil New Year season)
-              </div>
-              <div className="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-purple-100 dark:border-purple-900/50 shadow-2xs">
-                <span className="font-bold text-sky-900 dark:text-sky-300">Summer / Tourist Peak Season:</span> July – August (Travel & vacation rush)
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data.hourly_peak_forecast}>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#1e293b" : "#e2e8f0"} />
-              <XAxis dataKey="hour" stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} />
-              <YAxis stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} yAxisId="left" />
-              <YAxis stroke={isDarkMode ? "#64748b" : "#475569"} fontSize={11} yAxisId="right" orientation="right" domain={[0, 12]} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-                  borderColor: isDarkMode ? '#334155' : '#cbd5e1',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  color: isDarkMode ? '#f8fafc' : '#0f172a',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-              
-              {/* Highlighted Breakfast Section on Diagram */}
-              <ReferenceArea
-                yAxisId="left"
-                x1="07:00"
-                x2="09:00"
-                fill={isDarkMode ? "#d97706" : "#f59e0b"}
-                fillOpacity={isDarkMode ? 0.2 : 0.12}
-                stroke="#d97706"
-                strokeDasharray="3 3"
-                label={{
-                  value: "Breakfast Rush (07:30 – 09:30)",
-                  fill: isDarkMode ? "#fbbf24" : "#d97706",
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  position: "insideTop"
-                }}
-              />
-
-              {/* Highlighted Lunch Section on Diagram */}
-              <ReferenceArea
-                yAxisId="left"
-                x1="12:00"
-                x2="14:00"
-                fill={isDarkMode ? "#0284c7" : "#0284c7"}
-                fillOpacity={isDarkMode ? 0.2 : 0.12}
-                stroke="#0284c7"
-                strokeDasharray="3 3"
-                label={{
-                  value: "Lunch Rush (12:00 – 14:00)",
-                  fill: isDarkMode ? "#38bdf8" : "#0284c7",
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  position: "insideTop"
-                }}
-              />
-
-              {/* Highlighted Dinner Section on Diagram */}
-              <ReferenceArea
-                yAxisId="left"
-                x1="18:00"
-                x2="21:00"
-                fill={isDarkMode ? "#ea580c" : "#f97316"}
-                fillOpacity={isDarkMode ? 0.2 : 0.12}
-                stroke="#f97316"
-                strokeDasharray="3 3"
-                label={{
-                  value: "Dinner Rush (19:00 – 20:30)",
-                  fill: isDarkMode ? "#fb923c" : "#ea580c",
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  position: "insideTop"
-                }}
-              />
-
-              <Line yAxisId="left" type="monotone" dataKey="predicted_orders" stroke="#f97316" strokeWidth={3} name="Predicted Orders" dot={{ r: 3 }} />
-              <Line yAxisId="right" type="stepAfter" dataKey="staff_required" stroke="#10b981" strokeWidth={2.5} name="Chefs Required" />
-              <Line yAxisId="right" type="stepAfter" dataKey="actual_staff" stroke="#64748b" strokeWidth={2} strokeDasharray="4 4" name="Scheduled Chefs" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      )}
 
       {/* Kitchen Station Bottleneck Monitors */}
       <div className="glass-panel p-6 rounded-2xl space-y-4">
@@ -1233,11 +1300,10 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
                       <span className="text-xs font-bold text-slate-900 dark:text-white">
                         🚨 {st.name}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                        st.load_level >= 90
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${st.load_level >= 90
                           ? 'bg-rose-600 text-white'
                           : 'bg-amber-500 text-white'
-                      }`}>
+                        }`}>
                         {st.load_level}% Load ({st.bottleneck_status})
                       </span>
                     </div>
@@ -1307,13 +1373,12 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
             return (
               <div
                 key={st.id}
-                className={`p-5 rounded-2xl border flex flex-col justify-between shadow-sm transition-all ${
-                  isHighWorkload
-                    ? (st.load_level >= 90 
-                        ? 'bg-rose-50 border-2 border-rose-400 dark:bg-rose-950/40 dark:border-rose-500/60 shadow-rose-500/10' 
-                        : 'bg-amber-50 border-2 border-amber-400 dark:bg-amber-950/40 dark:border-amber-500/60 shadow-amber-500/10')
+                className={`p-5 rounded-2xl border flex flex-col justify-between shadow-sm transition-all ${isHighWorkload
+                    ? (st.load_level >= 90
+                      ? 'bg-rose-50 border-2 border-rose-400 dark:bg-rose-950/40 dark:border-rose-500/60 shadow-rose-500/10'
+                      : 'bg-amber-50 border-2 border-amber-400 dark:bg-amber-950/40 dark:border-amber-500/60 shadow-amber-500/10')
                     : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800'
-                }`}
+                  }`}
               >
                 <div>
                   {isHighWorkload && (
@@ -1325,11 +1390,10 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
 
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-extrabold text-slate-900 dark:text-white">{st.name}</span>
-                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                      st.load_level >= 90 
-                        ? 'bg-rose-600 text-white' 
+                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${st.load_level >= 90
+                        ? 'bg-rose-600 text-white'
                         : (st.load_level >= 80 ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300')
-                    }`}>
+                      }`}>
                       {st.load_level}% Load
                     </span>
                   </div>
@@ -1349,11 +1413,10 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 dark:text-slate-400 font-medium">Cooks Assigned:</span>
-                      <span className={`font-extrabold px-2 py-0.5 rounded border transition-all ${
-                        st.active_cooks < st.recommended_cooks
+                      <span className={`font-extrabold px-2 py-0.5 rounded border transition-all ${st.active_cooks < st.recommended_cooks
                           ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300 animate-pulse'
                           : 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
-                      }`}>
+                        }`}>
                         {st.active_cooks < st.recommended_cooks ? '⚠️ ' : '✓ '}
                         {st.active_cooks} (Target: {st.recommended_cooks})
                       </span>
@@ -1362,11 +1425,10 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
                 </div>
 
                 {st.load_level > 50 && (
-                  <div className={`mt-4 p-3 rounded-xl border ${
-                    isHighWorkload 
-                      ? 'bg-rose-100/70 border-rose-300 dark:bg-rose-950/80 dark:border-rose-900/80' 
+                  <div className={`mt-4 p-3 rounded-xl border ${isHighWorkload
+                      ? 'bg-rose-100/70 border-rose-300 dark:bg-rose-950/80 dark:border-rose-900/80'
                       : 'bg-amber-50/70 border-amber-200 dark:bg-amber-950/60 dark:border-amber-900/80'
-                  }`}>
+                    }`}>
                     <span className="text-[10px] uppercase font-black text-rose-800 dark:text-rose-400 flex items-center gap-1">
                       <ShieldCheck className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" /> Action to Eliminate Bottleneck:
                     </span>
@@ -1379,158 +1441,158 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
         </div>
       </div>
 
-      {/* Staff Skill Matrix */}
-      <div className="glass-panel p-6 rounded-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Staff Skill-Gap Analysis & Progression Paths</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Personalized training recommendations and succession planning for kitchen personnel</p>
+      {/* Staff Skill Matrix & Progression Paths (Staff, Skill Matrix & All Views) */}
+      {(activeRoleView === 'all' || activeRoleView === 'skill_matrix' || activeRoleView === 'staff_view') && (
+        <div className="glass-panel p-6 rounded-2xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Staff Skill-Gap Analysis & Progression Paths</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Personalized training recommendations and succession planning for kitchen personnel</p>
+            </div>
+            <button
+              onClick={() => {
+                setLoginErrorMsg("");
+                setShowStaffLoginModal(true);
+              }}
+              className="px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap w-fit"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Staff Self-Assessment</span>
+            </button>
           </div>
-          <button
-            onClick={() => {
-              setLoginErrorMsg("");
-              setShowStaffLoginModal(true);
-            }}
-            className="px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap w-fit"
-          >
-            <LogIn className="h-4 w-4" />
-            <span>Staff Self-Assessment</span>
-          </button>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {data.staff.map((member) => {
-            const hotWokHigh = data.stations.some(st => st.id === "station-1" && st.load_level >= 80);
-            const grillHigh = data.stations.some(st => st.id === "station-3" && st.load_level >= 80);
-            
-            let recommendedStation = "";
-            if (member.name.includes("S. Fernando")) recommendedStation = "Hot Wok & Kottu Station";
-            else if (member.name.includes("T. Silva")) recommendedStation = "Grill & Seafood Station";
-            else if (member.name.includes("K. Perera")) recommendedStation = "Curry & Rice Assembly Bay";
-            else if (member.name.includes("A. Jayasinghe")) recommendedStation = "Hot Wok & Kottu Station";
-            else if (member.name.includes("Wickramasinghe") || member.name.includes("Dissanayake")) recommendedStation = "Hot Wok & Assembly Support";
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {data.staff.map((member) => {
+              const hotWokHigh = data.stations.some(st => st.id === "station-1" && st.load_level >= 80);
+              const grillHigh = data.stations.some(st => st.id === "station-3" && st.load_level >= 80);
 
-            const isRecommendedForReallocation = 
-              (hotWokHigh && member.name.includes("S. Fernando")) ||
-              (grillHigh && member.name.includes("T. Silva"));
+              let recommendedStation = "";
+              if (member.name.includes("S. Fernando")) recommendedStation = "Hot Wok & Kottu Station";
+              else if (member.name.includes("T. Silva")) recommendedStation = "Grill & Seafood Station";
+              else if (member.name.includes("K. Perera")) recommendedStation = "Curry & Rice Assembly Bay";
+              else if (member.name.includes("A. Jayasinghe")) recommendedStation = "Hot Wok & Kottu Station";
+              else if (member.name.includes("Wickramasinghe") || member.name.includes("Dissanayake")) recommendedStation = "Hot Wok & Assembly Support";
 
-            return (
-              <div
-                key={member.id}
-                className={`p-5 rounded-2xl border shadow-sm space-y-3 transition-all ${
-                  member.isReallocated
-                    ? "bg-emerald-50/90 dark:bg-emerald-950/40 border-2 border-emerald-500 shadow-emerald-500/20 ring-2 ring-emerald-400/40"
-                    : (isRecommendedForReallocation
+              const isRecommendedForReallocation =
+                (hotWokHigh && member.name.includes("S. Fernando")) ||
+                (grillHigh && member.name.includes("T. Silva"));
+
+              return (
+                <div
+                  key={member.id}
+                  className={`p-5 rounded-2xl border shadow-sm space-y-3 transition-all ${member.isReallocated
+                      ? "bg-emerald-50/90 dark:bg-emerald-950/40 border-2 border-emerald-500 shadow-emerald-500/20 ring-2 ring-emerald-400/40"
+                      : (isRecommendedForReallocation
                         ? "bg-amber-50/90 dark:bg-amber-950/40 border-2 border-amber-500 shadow-amber-500/20 ring-2 ring-amber-400/40 animate-pulse"
                         : "bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800")
-                }`}
-              >
-                {/* Reallocation Status Badge */}
-                {member.isReallocated && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2.5 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-700">
-                    <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-                    <span>⚡ Reallocated: Reassigned to {member.reallocatedTo || member.assigned_station}</span>
-                  </div>
-                )}
-
-                {/* Specific Station Recommendation Badge */}
-                {isRecommendedForReallocation && !member.isReallocated && (
-                  <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-950 border border-amber-300 dark:border-amber-700 space-y-1.5 animate-pulse">
-                    <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-amber-900 dark:text-amber-200">
-                      <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                      <span>⚡ WORKLOAD SURGE RECOMMENDATION:</span>
+                    }`}
+                >
+                  {/* Reallocation Status Badge */}
+                  {member.isReallocated && (
+                    <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2.5 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-700">
+                      <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                      <span>⚡ Reallocated: Reassigned to {member.reallocatedTo || member.assigned_station}</span>
                     </div>
-                    <p className="text-xs font-black text-amber-950 dark:text-amber-100 leading-tight">
-                      Reallocate <span className="underline font-black">{member.name}</span> from <span className="font-bold">{member.assigned_station}</span> ➔ <span className="text-orange-700 dark:text-orange-300 font-extrabold underline">{recommendedStation}</span> based on skill matching.
-                    </p>
-                    
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updatedStaff = data.staff.map(s => {
-                          if (s.id === member.id) {
-                            return {
-                              ...s,
-                              assigned_station: `${recommendedStation} (Reallocated via AI)`,
-                              isReallocated: true,
-                              reallocatedTo: recommendedStation
-                            };
-                          }
-                          return s;
-                        });
+                  )}
 
-                        const updatedStations = data.stations.map(st => {
-                          if (st.name.includes(recommendedStation.split(' ')[0]) || (st.id === "station-1" && recommendedStation.includes("Hot Wok")) || (st.id === "station-3" && recommendedStation.includes("Grill"))) {
-                            const newActiveCooks = st.recommended_cooks || 3;
-                            return {
-                              ...st,
-                              active_cooks: newActiveCooks,
-                              load_level: Math.max(45, st.load_level - 35),
-                              queue_length: Math.max(2, st.queue_length - 6),
-                              avg_prep_time_mins: "4.2",
-                              bottleneck_status: "Smooth Flow",
-                              action: `Optimal staffing restored — ${member.name} reallocated based on skill matching`
-                            };
-                          }
-                          return st;
-                        });
+                  {/* Specific Station Recommendation Badge */}
+                  {isRecommendedForReallocation && !member.isReallocated && (
+                    <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-950 border border-amber-300 dark:border-amber-700 space-y-1.5 animate-pulse">
+                      <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-amber-900 dark:text-amber-200">
+                        <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                        <span>⚡ WORKLOAD SURGE RECOMMENDATION:</span>
+                      </div>
+                      <p className="text-xs font-black text-amber-950 dark:text-amber-100 leading-tight">
+                        Reallocate <span className="underline font-black">{member.name}</span> from <span className="font-bold">{member.assigned_station}</span> ➔ <span className="text-orange-700 dark:text-orange-300 font-extrabold underline">{recommendedStation}</span> based on skill matching.
+                      </p>
 
-                        setData({ ...data, staff: updatedStaff, stations: updatedStations });
-                        setDismissedToast(`⚡ ${member.name} reallocated to ${recommendedStation} based on skill matching!`);
-                        setTimeout(() => setDismissedToast(""), 4500);
-                      }}
-                      className="w-full mt-1 px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-black text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      <span>Reallocate {member.name.split(' ')[0]} to {recommendedStation}</span>
-                    </button>
-                  </div>
-                )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updatedStaff = data.staff.map(s => {
+                            if (s.id === member.id) {
+                              return {
+                                ...s,
+                                assigned_station: `${recommendedStation} (Reallocated via AI)`,
+                                isReallocated: true,
+                                reallocatedTo: recommendedStation
+                              };
+                            }
+                            return s;
+                          });
 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">{member.name}</h4>
-                    <span className={`text-[10px] font-extrabold ${member.isReallocated ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400'}`}>
-                      {member.assigned_station}
-                    </span>
-                  </div>
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${
-                    member.skill_level.includes("Trainee")
-                      ? "bg-sky-50 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300 border-sky-200 dark:border-sky-500/30"
-                      : (member.skill_level.includes("Expert")
+                          const updatedStations = data.stations.map(st => {
+                            if (st.name.includes(recommendedStation.split(' ')[0]) || (st.id === "station-1" && recommendedStation.includes("Hot Wok")) || (st.id === "station-3" && recommendedStation.includes("Grill"))) {
+                              const newActiveCooks = st.recommended_cooks || 3;
+                              return {
+                                ...st,
+                                active_cooks: newActiveCooks,
+                                load_level: Math.max(45, st.load_level - 35),
+                                queue_length: Math.max(2, st.queue_length - 6),
+                                avg_prep_time_mins: "4.2",
+                                bottleneck_status: "Smooth Flow",
+                                action: `Optimal staffing restored — ${member.name} reallocated based on skill matching`
+                              };
+                            }
+                            return st;
+                          });
+
+                          setData({ ...data, staff: updatedStaff, stations: updatedStations });
+                          setDismissedToast(`⚡ ${member.name} reallocated to ${recommendedStation} based on skill matching!`);
+                          setTimeout(() => setDismissedToast(""), 4500);
+                        }}
+                        className="w-full mt-1 px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-black text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        <span>Reallocate {member.name.split(' ')[0]} to {recommendedStation}</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">{member.name}</h4>
+                      <span className={`text-[10px] font-extrabold ${member.isReallocated ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400'}`}>
+                        {member.assigned_station}
+                      </span>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${member.skill_level.includes("Trainee")
+                        ? "bg-sky-50 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300 border-sky-200 dark:border-sky-500/30"
+                        : (member.skill_level.includes("Expert")
                           ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30"
                           : "bg-purple-50 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300 border-purple-200 dark:border-purple-500/30")
-                  }`}>
-                    {member.skill_level}
-                  </span>
-                </div>
-
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium">Efficiency Rating:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">{member.efficiency_rating}%</span>
+                      }`}>
+                      {member.skill_level}
+                    </span>
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Identified Skill-Gap: <span className="text-amber-700 dark:text-amber-300 font-bold">{member.skill_gap}</span>
+
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 dark:text-slate-400 font-medium">Efficiency Rating:</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">{member.efficiency_rating}%</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Identified Skill-Gap: <span className="text-amber-700 dark:text-amber-300 font-bold">{member.skill_gap}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-purple-50 dark:bg-slate-950/60 border border-purple-100 dark:border-slate-800/80 text-xs">
+                    <span className="text-[10px] font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1">
+                      <Award className="h-3.5 w-3.5" /> Personalized Training:
+                    </span>
+                    <p className="text-slate-700 dark:text-slate-300 text-xs mt-1 font-medium">{member.training_recommendation}</p>
+                  </div>
+
+                  <div className="text-xs text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 pt-1">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>{member.career_progression}</span>
                   </div>
                 </div>
-
-                <div className="p-3 rounded-xl bg-purple-50 dark:bg-slate-950/60 border border-purple-100 dark:border-slate-800/80 text-xs">
-                  <span className="text-[10px] font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1">
-                    <Award className="h-3.5 w-3.5" /> Personalized Training:
-                  </span>
-                  <p className="text-slate-700 dark:text-slate-300 text-xs mt-1 font-medium">{member.training_recommendation}</p>
-                </div>
-
-                <div className="text-xs text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 pt-1">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>{member.career_progression}</span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Mobile Waiter Order Entry Simulation Modal with Sri Lankan & Pizza Menu */}
       {showOrderSimulatorModal && (
@@ -1638,257 +1700,254 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
 
               {/* Sri Lankan Dishes Category */}
               {menuItems.filter(i => i.category === "Sri Lankan" && (
-                !menuSearchQuery.trim() || 
-                i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) || 
+                !menuSearchQuery.trim() ||
+                i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) ||
                 i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
               )).length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🇱🇰</span>
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                      Authentic Sri Lankan Dishes
-                    </h4>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {menuItems.filter(i => i.category === "Sri Lankan" && (
-                      !menuSearchQuery.trim() || 
-                      i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) || 
-                      i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
-                    )).map((item) => (
-                    <div
-                      key={item.id}
-                      className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                        item.checked
-                          ? "bg-orange-50/70 border-orange-300 dark:bg-orange-950/40 dark:border-orange-800"
-                          : "bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <input
-                          type="checkbox"
-                          checked={item.checked}
-                          onChange={() => toggleMenuItem(item.id)}
-                          className="h-4 w-4 rounded accent-orange-600 cursor-pointer"
-                        />
-                        <div>
-                          <span className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
-                            <span>{item.icon}</span> {item.name}
-                          </span>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
-                            Target: {item.station}
-                          </span>
-                        </div>
-                      </div>
-
-                      {item.checked && (
-                        <div className="flex items-center gap-3">
-                          {/* Size Selector */}
-                          <select
-                            value={item.size}
-                            onChange={(e) => updateItemSize(item.id, e.target.value)}
-                            className="px-2.5 py-1 text-[11px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold"
-                          >
-                            <option value="Small">Small</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Large">Large</option>
-                            <option value="Regular">Regular Portion</option>
-                          </select>
-
-                          {/* Quantity Selector */}
-                          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5">
-                            <button
-                              type="button"
-                              onClick={() => updateItemQty(item.id, -1)}
-                              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-                            <span className="font-black text-xs px-1.5">{item.qty}</span>
-                            <button
-                              type="button"
-                              onClick={() => updateItemQty(item.id, 1)}
-                              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                  <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🇱🇰</span>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                        Authentic Sri Lankan Dishes
+                      </h4>
                     </div>
-                  ))}
-                </div>
-              </div>
-              )}
+
+                    <div className="space-y-2">
+                      {menuItems.filter(i => i.category === "Sri Lankan" && (
+                        !menuSearchQuery.trim() ||
+                        i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) ||
+                        i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
+                      )).map((item) => (
+                        <div
+                          key={item.id}
+                          className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${item.checked
+                              ? "bg-orange-50/70 border-orange-300 dark:bg-orange-950/40 dark:border-orange-800"
+                              : "bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
+                            }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <input
+                              type="checkbox"
+                              checked={item.checked}
+                              onChange={() => toggleMenuItem(item.id)}
+                              className="h-4 w-4 rounded accent-orange-600 cursor-pointer"
+                            />
+                            <div>
+                              <span className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
+                                <span>{item.icon}</span> {item.name}
+                              </span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
+                                Target: {item.station}
+                              </span>
+                            </div>
+                          </div>
+
+                          {item.checked && (
+                            <div className="flex items-center gap-3">
+                              {/* Size Selector */}
+                              <select
+                                value={item.size}
+                                onChange={(e) => updateItemSize(item.id, e.target.value)}
+                                className="px-2.5 py-1 text-[11px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold"
+                              >
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                                <option value="Regular">Regular Portion</option>
+                              </select>
+
+                              {/* Quantity Selector */}
+                              <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQty(item.id, -1)}
+                                  className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </button>
+                                <span className="font-black text-xs px-1.5">{item.qty}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQty(item.id, 1)}
+                                  className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               {/* Pizza Variety Category */}
               {menuItems.filter(i => i.category === "Pizza" && (
-                !menuSearchQuery.trim() || 
-                i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) || 
+                !menuSearchQuery.trim() ||
+                i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) ||
                 i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
               )).length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <Pizza className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                      Artisan Pizza Variety
-                    </h4>
-                  </div>
-
-                  <div className="space-y-2">
-                    {menuItems.filter(i => i.category === "Pizza" && (
-                      !menuSearchQuery.trim() || 
-                      i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) || 
-                      i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
-                    )).map((item) => (
-                    <div
-                      key={item.id}
-                      className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                        item.checked
-                          ? "bg-amber-50/70 border-amber-300 dark:bg-amber-950/40 dark:border-amber-800"
-                          : "bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <input
-                          type="checkbox"
-                          checked={item.checked}
-                          onChange={() => toggleMenuItem(item.id)}
-                          className="h-4 w-4 rounded accent-orange-600 cursor-pointer"
-                        />
-                        <div>
-                          <span className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
-                            <span>{item.icon}</span> {item.name}
-                          </span>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
-                            Target: {item.station}
-                          </span>
-                        </div>
-                      </div>
-
-                      {item.checked && (
-                        <div className="flex items-center gap-3">
-                          {/* Pizza Size Selector */}
-                          <select
-                            value={item.size}
-                            onChange={(e) => updateItemSize(item.id, e.target.value)}
-                            className="px-2.5 py-1 text-[11px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold"
-                          >
-                            <option value="Small (9&quot;)">Small (9")</option>
-                            <option value="Medium (12&quot;)">Medium (12")</option>
-                            <option value="Large (15&quot;)">Large (15")</option>
-                          </select>
-
-                          {/* Quantity Selector */}
-                          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5">
-                            <button
-                              type="button"
-                              onClick={() => updateItemQty(item.id, -1)}
-                              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-                            <span className="font-black text-xs px-1.5">{item.qty}</span>
-                            <button
-                              type="button"
-                              onClick={() => updateItemQty(item.id, 1)}
-                              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                  <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Pizza className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                        Artisan Pizza Variety
+                      </h4>
                     </div>
-                  ))}
-                </div>
-              </div>
-              )}
+
+                    <div className="space-y-2">
+                      {menuItems.filter(i => i.category === "Pizza" && (
+                        !menuSearchQuery.trim() ||
+                        i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) ||
+                        i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
+                      )).map((item) => (
+                        <div
+                          key={item.id}
+                          className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${item.checked
+                              ? "bg-amber-50/70 border-amber-300 dark:bg-amber-950/40 dark:border-amber-800"
+                              : "bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
+                            }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <input
+                              type="checkbox"
+                              checked={item.checked}
+                              onChange={() => toggleMenuItem(item.id)}
+                              className="h-4 w-4 rounded accent-orange-600 cursor-pointer"
+                            />
+                            <div>
+                              <span className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
+                                <span>{item.icon}</span> {item.name}
+                              </span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
+                                Target: {item.station}
+                              </span>
+                            </div>
+                          </div>
+
+                          {item.checked && (
+                            <div className="flex items-center gap-3">
+                              {/* Pizza Size Selector */}
+                              <select
+                                value={item.size}
+                                onChange={(e) => updateItemSize(item.id, e.target.value)}
+                                className="px-2.5 py-1 text-[11px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold"
+                              >
+                                <option value="Small (9&quot;)">Small (9")</option>
+                                <option value="Medium (12&quot;)">Medium (12")</option>
+                                <option value="Large (15&quot;)">Large (15")</option>
+                              </select>
+
+                              {/* Quantity Selector */}
+                              <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQty(item.id, -1)}
+                                  className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </button>
+                                <span className="font-black text-xs px-1.5">{item.qty}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQty(item.id, 1)}
+                                  className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               {/* Beverages Category */}
               {menuItems.filter(i => i.category === "Beverages" && (
-                !menuSearchQuery.trim() || 
-                i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) || 
+                !menuSearchQuery.trim() ||
+                i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) ||
                 i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
               )).length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🥤</span>
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                      Beverages & Refreshers
-                    </h4>
-                  </div>
-
-                  <div className="space-y-2">
-                    {menuItems.filter(i => i.category === "Beverages" && (
-                      !menuSearchQuery.trim() || 
-                      i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) || 
-                      i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
-                    )).map((item) => (
-                    <div
-                      key={item.id}
-                      className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                        item.checked
-                          ? "bg-sky-50/70 border-sky-300 dark:bg-sky-950/40 dark:border-sky-800"
-                          : "bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <input
-                          type="checkbox"
-                          checked={item.checked}
-                          onChange={() => toggleMenuItem(item.id)}
-                          className="h-4 w-4 rounded accent-orange-600 cursor-pointer"
-                        />
-                        <div>
-                          <span className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
-                            <span>{item.icon}</span> {item.name}
-                          </span>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
-                            Target: {item.station}
-                          </span>
-                        </div>
-                      </div>
-
-                      {item.checked && (
-                        <div className="flex items-center gap-3">
-                          {/* Size Selector */}
-                          <select
-                            value={item.size}
-                            onChange={(e) => updateItemSize(item.id, e.target.value)}
-                            className="px-2.5 py-1 text-[11px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold"
-                          >
-                            <option value="500ml">500ml</option>
-                            <option value="1.5L">1.5L Bottle</option>
-                            <option value="Regular Glass">Regular Glass</option>
-                            <option value="Large Pitcher">Large Pitcher</option>
-                          </select>
-
-                          {/* Quantity Selector */}
-                          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5">
-                            <button
-                              type="button"
-                              onClick={() => updateItemQty(item.id, -1)}
-                              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-                            <span className="font-black text-xs px-1.5">{item.qty}</span>
-                            <button
-                              type="button"
-                              onClick={() => updateItemQty(item.id, 1)}
-                              className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                  <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🥤</span>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                        Beverages & Refreshers
+                      </h4>
                     </div>
-                  ))}
-                </div>
-              </div>
-              )}
+
+                    <div className="space-y-2">
+                      {menuItems.filter(i => i.category === "Beverages" && (
+                        !menuSearchQuery.trim() ||
+                        i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) ||
+                        i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())
+                      )).map((item) => (
+                        <div
+                          key={item.id}
+                          className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${item.checked
+                              ? "bg-sky-50/70 border-sky-300 dark:bg-sky-950/40 dark:border-sky-800"
+                              : "bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
+                            }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <input
+                              type="checkbox"
+                              checked={item.checked}
+                              onChange={() => toggleMenuItem(item.id)}
+                              className="h-4 w-4 rounded accent-orange-600 cursor-pointer"
+                            />
+                            <div>
+                              <span className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
+                                <span>{item.icon}</span> {item.name}
+                              </span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
+                                Target: {item.station}
+                              </span>
+                            </div>
+                          </div>
+
+                          {item.checked && (
+                            <div className="flex items-center gap-3">
+                              {/* Size Selector */}
+                              <select
+                                value={item.size}
+                                onChange={(e) => updateItemSize(item.id, e.target.value)}
+                                className="px-2.5 py-1 text-[11px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 font-bold"
+                              >
+                                <option value="500ml">500ml</option>
+                                <option value="1.5L">1.5L Bottle</option>
+                                <option value="Regular Glass">Regular Glass</option>
+                                <option value="Large Pitcher">Large Pitcher</option>
+                              </select>
+
+                              {/* Quantity Selector */}
+                              <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQty(item.id, -1)}
+                                  className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </button>
+                                <span className="font-black text-xs px-1.5">{item.qty}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateItemQty(item.id, 1)}
+                                  className="p-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               {/* Empty Search Result State */}
               {menuSearchQuery.trim() && menuItems.filter(i => i.name.toLowerCase().includes(menuSearchQuery.toLowerCase()) || i.category.toLowerCase().includes(menuSearchQuery.toLowerCase())).length === 0 && (
@@ -2050,8 +2109,8 @@ export default function KitchenStaffDashboard({ isDarkMode }) {
                     value={formData.name}
                     onChange={(e) => {
                       const val = e.target.value;
-                      const selected = data.staff.find(s => 
-                        s.name.toLowerCase() === val.toLowerCase() || 
+                      const selected = data.staff.find(s =>
+                        s.name.toLowerCase() === val.toLowerCase() ||
                         val.toLowerCase().includes(s.name.toLowerCase())
                       );
                       if (selected) {
