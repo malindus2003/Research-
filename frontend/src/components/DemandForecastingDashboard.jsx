@@ -4,7 +4,8 @@ import {
   BarChart3, AlertCircle, ArrowUpRight, ArrowDownRight, RefreshCw, Cpu, 
   Database, Sliders, Layers, Plus, Check, X, Printer, ChefHat, ShieldCheck, 
   Flame, Scale, PieChart, Info, HelpCircle, Activity, ChevronRight, Eye, Play,
-  Zap, Clock, Award, FileText, ToggleLeft, ToggleRight, Sun, Droplets, Utensils
+  Zap, Clock, Award, FileText, ToggleLeft, ToggleRight, Sun, Droplets, Utensils,
+  Users
 } from 'lucide-react';
 import { 
   ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, 
