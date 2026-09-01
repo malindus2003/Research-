@@ -13,11 +13,23 @@ import {
 } from 'recharts';
 import axios from 'axios';
 
-export default function DemandForecastingDashboard({ isDarkMode }) {
+export default function DemandForecastingDashboard({ isDarkMode, currentRole = 'admin' }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'analytics', 'xai', 'simulator', 'retraining', 'closed_loop'
-  const [userRole, setUserRole] = useState('admin'); // 'staff', 'manager', 'admin'
+  const [userRole, setUserRole] = useState(currentRole === 'staff' ? 'staff' : (currentRole === 'manager' ? 'manager' : 'admin'));
+  
+  useEffect(() => {
+    if (currentRole === 'staff') {
+      setUserRole('staff');
+      setActiveTab('overview');
+    } else if (currentRole === 'manager') {
+      setUserRole('manager');
+      if (activeTab === 'retraining') setActiveTab('overview');
+    } else if (currentRole === 'admin') {
+      setUserRole('admin');
+    }
+  }, [currentRole]);
   
   // Search & Filter
   const [selectedCategory, setSelectedCategory] = useState('All');

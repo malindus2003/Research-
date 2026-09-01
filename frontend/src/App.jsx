@@ -337,7 +337,7 @@ export default function App() {
 
         {/* Module 6: Demand Prediction */}
         {activeModule === 'demand' && (
-          <DemandForecastingDashboard isDarkMode={isDarkMode} />
+          <DemandForecastingDashboard isDarkMode={isDarkMode} currentRole={currentRole} />
         )}
 
         {/* Module 7: Smart Waste Bin */}

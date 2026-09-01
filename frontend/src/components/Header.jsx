@@ -21,18 +21,28 @@ import {
   Armchair,
   Receipt,
   Flame,
-  Utensils
+  Utensils,
+  Briefcase
 } from 'lucide-react';
 
 export const ROLES = [
   {
     id: 'admin',
-    title: 'Admin (Full Access)',
-    shortTitle: 'Admin',
-    description: 'Executive overview, AI models, inventory valuation, and all research modules',
+    title: 'Admin / ML Engineer',
+    shortTitle: 'Admin / ML Eng',
+    description: 'Full ML pipeline retraining, XAI telemetry, inventory valuation, and executive overview',
     icon: <Crown className="h-4 w-4 text-amber-500" />,
     badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
     defaultModule: 'executive'
+  },
+  {
+    id: 'manager',
+    title: 'Restaurant Manager',
+    shortTitle: 'Manager',
+    description: 'Demand forecasts, XAI factors, simulation sandbox, orders ledger, and kitchen telemetry',
+    icon: <Briefcase className="h-4 w-4 text-purple-500" />,
+    badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+    defaultModule: 'demand'
   },
   {
     id: 'cashier',
@@ -47,7 +57,7 @@ export const ROLES = [
     id: 'staff',
     title: 'Kitchen & Floor Staff',
     shortTitle: 'Kitchen Staff',
-    description: 'Live KDS cooking tickets, line station loads, and cold storage restock',
+    description: 'Live KDS cooking tickets, daily prep guidance sheets, line station loads, and stock',
     icon: <ChefHat className="h-4 w-4 text-blue-500" />,
     badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
     defaultModule: 'kds'
@@ -82,6 +92,58 @@ export default function Header({
 
   // ROLE-SPECIFIC DOCK MODULE DEFINITIONS (1 Screen = 1 Dedicated Purpose)
   const getModulesForRole = () => {
+    if (currentRole === 'manager') {
+      return [
+        {
+          id: 'executive',
+          label: 'Executive Hub',
+          shortLabel: 'Executive',
+          badge: 'Core',
+          icon: <Layers className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'demand',
+          label: 'Demand Forecasting',
+          shortLabel: 'Demand & XAI',
+          badge: 'AI',
+          badgeColor: 'bg-emerald-600',
+          icon: <TrendingUp className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'orders_ledger',
+          label: 'Orders & Sales Ledger',
+          shortLabel: 'Sales Ledger',
+          icon: <Receipt className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'inventory',
+          label: 'Inventory & Stock',
+          shortLabel: 'Inventory',
+          icon: <Package className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'kitchen',
+          label: 'Kitchen & Staff',
+          shortLabel: 'Kitchen',
+          icon: <Users className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'spoilage',
+          label: 'Food Spoilage & Quality',
+          shortLabel: 'Spoilage',
+          badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
+          badgeColor: 'bg-rose-500',
+          icon: <Cpu className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'waste',
+          label: 'Smart Waste Bin',
+          shortLabel: 'Waste Bin',
+          icon: <Trash2 className="h-3.5 w-3.5" />
+        }
+      ];
+    }
+
     if (currentRole === 'cashier') {
       return [
         {
@@ -116,6 +178,12 @@ export default function Header({
           badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
           badgeColor: 'bg-amber-500',
           icon: <Flame className="h-3.5 w-3.5" />
+        },
+        {
+          id: 'demand',
+          label: 'Daily Prep Guidance',
+          shortLabel: 'Prep Guide',
+          icon: <Utensils className="h-3.5 w-3.5" />
         },
         {
           id: 'kitchen',
