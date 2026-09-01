@@ -49,6 +49,8 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
 
   // New Order State
   const [selectedDish, setSelectedDish] = useState(null);
+  const [additionalItems, setAdditionalItems] = useState([]);
+  const [showAddItemSelector, setShowAddItemSelector] = useState(false);
   const [tableNumber, setTableNumber] = useState("Table 01");
   const [orderType, setOrderType] = useState("Dine-In");
   const [portionCount, setPortionCount] = useState(1);
@@ -86,12 +88,15 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
 
     try {
       setSubmittingOrder(true);
+      const allItems = [
+        { menu_id: selectedDish.id, quantity: Number(portionCount) },
+        ...additionalItems.map(item => ({ menu_id: item.menu_id, quantity: Number(item.quantity) }))
+      ];
+
       const payload = {
         table_no: orderType === 'Dine-In' ? tableNumber : `${orderType} #${Math.floor(10 + Math.random() * 90)}`,
         order_type: orderType,
-        items: [
-          { menu_id: selectedDish.id, quantity: Number(portionCount) }
-        ],
+        items: allItems,
         customer_note: customerNote
       };
 
@@ -99,6 +104,8 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
       setOrderSuccessMessage(`Order #${res.data.order.order_number} placed for ${res.data.order.table_no}! Smart FIFO ingredients deducted.`);
       setShowNewOrderModal(false);
       setSelectedDish(null);
+      setAdditionalItems([]);
+      setShowAddItemSelector(false);
       setCustomerNote("");
       setPortionCount(1);
       
@@ -1048,7 +1055,9 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
               <div>
                 <div className="flex justify-between font-bold mb-1">
                   <span className="text-slate-800 dark:text-slate-200">Portion Quantity:</span>
-                  <span className="text-emerald-800 dark:text-emerald-400 text-sm">{portionCount} portions (Total: Rs. {selectedDish.price_lkr * portionCount})</span>
+                  <span className="text-emerald-800 dark:text-emerald-400 text-sm font-mono font-bold">
+                    {portionCount} portions (Subtotal: Rs. {selectedDish.price_lkr * portionCount})
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map(n => (
@@ -1068,6 +1077,118 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
                 </div>
               </div>
 
+              {/* Additional Items Section */}
+              <div className="pt-2 border-t border-[#e1eae4] dark:border-slate-800">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <Plus className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
+                    Additional Items in Order ({additionalItems.length}):
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddItemSelector(!showAddItemSelector)}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-extrabold text-[11px] transition-all cursor-pointer flex items-center gap-1"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    {showAddItemSelector ? 'Close Picker' : '➕ Add More Items'}
+                  </button>
+                </div>
+
+                {/* Additional Items Cart List */}
+                {additionalItems.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {additionalItems.map((item, idx) => (
+                      <div key={`${item.menu_id}-${idx}`} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
+                        <div>
+                          <h5 className="font-bold text-xs text-slate-900 dark:text-white">{item.name}</h5>
+                          <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-400 font-mono">
+                            Rs. {item.price_lkr * item.quantity} ({item.station_name})
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = [...additionalItems];
+                              if (updated[idx].quantity > 1) {
+                                updated[idx].quantity -= 1;
+                                setAdditionalItems(updated);
+                              }
+                            }}
+                            className="h-6 w-6 rounded bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center hover:bg-slate-300 cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="font-bold text-xs px-1.5 text-slate-900 dark:text-white">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = [...additionalItems];
+                              updated[idx].quantity += 1;
+                              setAdditionalItems(updated);
+                            }}
+                            className="h-6 w-6 rounded bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center hover:bg-slate-300 cursor-pointer"
+                          >
+                            +
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAdditionalItems(additionalItems.filter((_, i) => i !== idx));
+                            }}
+                            className="p-1 text-rose-500 hover:text-rose-700 cursor-pointer ml-1"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add Item Dropdown Picker */}
+                {showAddItemSelector && (
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 max-h-48 overflow-y-auto space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Select Menu Item to Add:</span>
+                    {menu.filter(m => m.id !== selectedDish.id).map(m => {
+                      const alreadyAdded = additionalItems.some(i => i.menu_id === m.id);
+                      return (
+                        <div key={m.id} className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs">
+                          <div className="flex items-center gap-2">
+                            <img src={m.image_url} alt={m.name} className="h-8 w-8 rounded object-cover" />
+                            <div>
+                              <span className="font-bold text-slate-900 dark:text-white block">{m.name}</span>
+                              <span className="text-[10px] text-emerald-800 dark:text-emerald-400 font-mono font-bold">Rs. {m.price_lkr}</span>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            disabled={alreadyAdded}
+                            onClick={() => {
+                              setAdditionalItems([...additionalItems, {
+                                menu_id: m.id,
+                                name: m.name,
+                                price_lkr: m.price_lkr,
+                                station_name: m.station_name,
+                                quantity: 1,
+                                recipe_bom: m.recipe_bom || []
+                              }]);
+                            }}
+                            className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
+                              alreadyAdded
+                                ? 'bg-slate-100 text-slate-400 dark:bg-slate-800 cursor-not-allowed'
+                                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                            }`}
+                          >
+                            {alreadyAdded ? 'Added ✓' : '+ Add'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="text-slate-800 dark:text-slate-200 font-bold block mb-1">Kitchen / Chef Notes</label>
                 <textarea
@@ -1079,6 +1200,16 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
                 />
               </div>
 
+              {/* Total Order Summary Pill */}
+              <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 flex items-center justify-between">
+                <span className="font-extrabold text-xs text-emerald-950 dark:text-emerald-200">
+                  Total Order Amount ({1 + additionalItems.reduce((acc, i) => acc + i.quantity, 0)} items):
+                </span>
+                <span className="font-black text-sm text-emerald-900 dark:text-emerald-300 font-mono">
+                  Rs. {(selectedDish.price_lkr * portionCount) + additionalItems.reduce((sum, item) => sum + (item.price_lkr * item.quantity), 0)}
+                </span>
+              </div>
+
               {/* Smart FIFO Ingredient Deduction Preview */}
               <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 space-y-1">
                 <span className="font-bold text-emerald-950 dark:text-emerald-300 flex items-center gap-1.5 text-[11px]">
@@ -1086,7 +1217,10 @@ export default function OrderManagementDashboard({ onRefresh, isDarkMode }) {
                   Smart FIFO Auto-Deduction preview:
                 </span>
                 <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                  {selectedDish.recipe_bom.map(b => `${(b.required_kg * portionCount).toFixed(2)}kg ${b.ingredient_name.split('(')[0]}`).join(' + ')} will be automatically deducted from cold storage batches with lowest remaining shelf-life.
+                  {[
+                    ...selectedDish.recipe_bom.map(b => `${(b.required_kg * portionCount).toFixed(2)}kg ${b.ingredient_name.split('(')[0]}`),
+                    ...additionalItems.flatMap(i => (i.recipe_bom || []).map(b => `${(b.required_kg * i.quantity).toFixed(2)}kg ${b.ingredient_name.split('(')[0]}`))
+                  ].join(' + ')} will be automatically deducted from cold storage batches with lowest remaining shelf-life.
                 </p>
               </div>
 

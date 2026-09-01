@@ -117,7 +117,24 @@ def get_demand_forecasts():
             "weather_impact": "+18% delivery & comfort food surge",
             "active_promotions": "10% Family Dinner Flash Deal",
             "reservations_booked": 64,
-            "local_events": "Inter-University Rugby Match (Nearby Venue)"
+            "local_events": "Inter-University Rugby Match (Nearby Venue)",
+            "seasonal_rush_periods": [
+                {
+                    "name": "Festive / Holiday Season",
+                    "period": "December – Early January",
+                    "description": "Christmas / New Year rush"
+                },
+                {
+                    "name": "New Year / Spring Festival",
+                    "period": "Mid-April",
+                    "description": "Sinhala & Tamil New Year season"
+                },
+                {
+                    "name": "Summer / Tourist Peak Season",
+                    "period": "July – August",
+                    "description": "Travel & vacation rush"
+                }
+            ]
         },
         "items": MENU_ITEMS_FORECAST,
         "multi_day_forecast": multi_day_trend
