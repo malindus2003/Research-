@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ClipboardPlus, X } from 'lucide-react';
 
-const MAIN_CATEGORIES = ['Food', 'Plastic', 'Paper', 'Other'];
+const MAIN_CATEGORIES = ['Food', 'Plastic', 'Paper'];
 
 const FOOD_ITEMS = {
   Fruit: ['Banana', 'Mango', 'Apple', 'Orange', 'Pineapple', 'Papaya', 'Other Fruit'],
@@ -44,23 +44,6 @@ const FOOD_OPTIONS = {
   reasons: ['Peeling / Trimming', 'Bone / Shell Removal', 'Customer Leftover', 'Overproduction', 'Spoiled During Storage', 'Expired', 'Burnt / Cooking Error', 'Dropped', 'Incorrect Order', 'Quality Rejection', 'Other'],
 };
 
-const CATEGORY_OPTIONS = {
-  Plastic: {
-    label: 'Plastic Type',
-    values: ['Bottle', 'Cup', 'Food Container', 'Lid', 'Straw', 'Cutlery', 'Wrapper', 'Bag / Polythene', 'Sachet', 'Other Plastic'],
-    conditions: ['Clean', 'Food-soiled', 'Wet', 'Damaged', 'Mixed Material', 'Other'],
-  },
-  Paper: {
-    label: 'Paper Type',
-    values: ['Paper Cup', 'Paper Plate / Bowl', 'Tissue / Napkin', 'Cardboard', 'Paper Bag', 'Food Wrapper', 'Carton', 'Receipt / Paper', 'Other Paper'],
-    conditions: ['Clean', 'Food-soiled', 'Wet', 'Coated / Laminated', 'Mixed Material', 'Other'],
-  },
-  Other: {
-    label: 'Waste Type',
-    values: ['Glass', 'Metal', 'Aluminium', 'Wood', 'Rubber', 'Fabric / Textile', 'Composite Material', 'Cleaning / Sanitary Waste', 'Unknown', 'Other'],
-  },
-};
-
 const LOCATIONS = [
   'Preparation Kitchen',
   'Cooking Area',
@@ -78,7 +61,6 @@ const INITIAL_FORM = {
   foodCategory: '',
   item: '',
   part: '',
-  wasteType: '',
   wasteStage: '',
   edibility: '',
   condition: '',
@@ -219,12 +201,7 @@ export default function WasteRegistrationModal({ isOpen, onClose }) {
         ...commonFields,
       };
     } else {
-      registration = {
-        mainCategory: form.mainCategory,
-        wasteType: form.wasteType,
-        ...(form.mainCategory !== 'Other' && { condition: form.condition }),
-        ...commonFields,
-      };
+      registration = { mainCategory: form.mainCategory, ...commonFields };
     }
 
     console.log('Registered wastage:', registration);
@@ -233,8 +210,6 @@ export default function WasteRegistrationModal({ isOpen, onClose }) {
 
   const foodItems = form.foodCategory ? FOOD_ITEMS[form.foodCategory] : [];
   const partOptions = form.item ? (ITEM_PARTS[form.item] || GENERIC_PARTS) : [];
-  const nonFoodOptions = CATEGORY_OPTIONS[form.mainCategory];
-
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 px-3 py-4 backdrop-blur-sm sm:px-6"
@@ -253,7 +228,7 @@ export default function WasteRegistrationModal({ isOpen, onClose }) {
             </span>
             <div>
               <h3 id="waste-registration-title" className="text-lg font-bold text-slate-900 dark:text-white">Register Wastage</h3>
-              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Record a manual waste entry for classification and measurement.</p>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Record detailed food-waste data or update Plastic and Paper bin weight.</p>
             </div>
           </div>
           <button
@@ -312,16 +287,6 @@ export default function WasteRegistrationModal({ isOpen, onClose }) {
                   />
                 )}
 
-                {nonFoodOptions && (
-                  <SelectField
-                    id="non-food-type"
-                    label={nonFoodOptions.label}
-                    value={form.wasteType}
-                    onChange={(event) => updateField('wasteType', event.target.value)}
-                    options={nonFoodOptions.values}
-                    required
-                  />
-                )}
               </div>
             </Section>
 
@@ -359,18 +324,6 @@ export default function WasteRegistrationModal({ isOpen, onClose }) {
                     options={FOOD_OPTIONS.reasons}
                   />
                 </div>
-              </Section>
-            )}
-
-            {nonFoodOptions?.conditions && (
-              <Section title="Waste Details">
-                <SelectField
-                  id="non-food-condition"
-                  label="Condition"
-                  value={form.condition}
-                  onChange={(event) => updateField('condition', event.target.value)}
-                  options={nonFoodOptions.conditions}
-                />
               </Section>
             )}
 

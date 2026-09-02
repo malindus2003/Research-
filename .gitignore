@@ -29,6 +29,8 @@ wheels/
 venv/
 ENV/
 .env
+.waste_notification_state.json
+.recycling_companies.json
 
 # Logs
 npm-debug.log*
