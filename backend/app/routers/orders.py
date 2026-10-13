@@ -16,7 +16,7 @@ MENU_ITEMS = [
         "price_lkr": 1450.0,
         "prep_time_mins": 8,
         "station_id": "station-1",
-        "station_name": "Hot Wok & Kottu Station",
+        "station_name": "Hot Kitchen",
         "image_url": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&auto=format&fit=crop&q=80",
         "description": "Flaky godamba roti shredded with spiced fresh chicken breast, carrots, leeks, and egg.",
         "recipe_bom": [
@@ -30,8 +30,8 @@ MENU_ITEMS = [
         "category": "Seafood",
         "price_lkr": 2850.0,
         "prep_time_mins": 14,
-        "station_id": "station-3",
-        "station_name": "Grill & Seafood Station",
+        "station_id": "station-2",
+        "station_name": "Grill",
         "image_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500&auto=format&fit=crop&q=80",
         "description": "Pan-seared Atlantic salmon fillet served with garlic herb butter and fresh garden greens.",
         "recipe_bom": [
@@ -46,7 +46,7 @@ MENU_ITEMS = [
         "price_lkr": 1150.0,
         "prep_time_mins": 6,
         "station_id": "station-1",
-        "station_name": "Hot Wok & Kottu Station",
+        "station_name": "Hot Kitchen",
         "image_url": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=500&auto=format&fit=crop&q=80",
         "description": "Crisp Belgian waffle topped with sliced ripe bananas, wild berries, honey, and fresh whipped cream.",
         "recipe_bom": [
@@ -61,8 +61,8 @@ MENU_ITEMS = [
         "category": "Healthy & Salads",
         "price_lkr": 980.0,
         "prep_time_mins": 4,
-        "station_id": "station-4",
-        "station_name": "Salad & Cold Prep Station",
+        "station_id": "station-3",
+        "station_name": "Cold Salad",
         "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=80",
         "description": "Fresh romaine lettuce, baby spinach leaves, ripe vine tomatoes, and aged cheese shavings.",
         "recipe_bom": [
@@ -77,8 +77,8 @@ MENU_ITEMS = [
         "category": "Main Course",
         "price_lkr": 3200.0,
         "prep_time_mins": 15,
-        "station_id": "station-3",
-        "station_name": "Grill & Seafood Station",
+        "station_id": "station-2",
+        "station_name": "Grill",
         "image_url": "https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=500&auto=format&fit=crop&q=80",
         "description": "Chargrilled prime grass-fed beef sirloin with roasted tomatoes, red wine reduction, and herbs.",
         "recipe_bom": [
@@ -92,14 +92,42 @@ MENU_ITEMS = [
         "category": "Beverages & Breakfast",
         "price_lkr": 850.0,
         "prep_time_mins": 5,
-        "station_id": "station-4",
-        "station_name": "Salad & Cold Prep Station",
+        "station_id": "station-3",
+        "station_name": "Cold Salad",
         "image_url": "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=500&auto=format&fit=crop&q=80",
         "description": "Blended ripe bananas and fresh strawberries with pasteurized whole milk, chia seeds, and granola.",
         "recipe_bom": [
             {"ingredient_name": "Cavendish Ripe Bananas (Crate)", "category": "Fruits", "required_kg": 0.20},
             {"ingredient_name": "Fresh Farm Strawberries (Punnet)", "category": "Fruits", "required_kg": 0.15},
             {"ingredient_name": "Pasteurized Whole Milk (Bulk)", "category": "Dairy", "required_kg": 0.15}
+        ]
+    },
+    {
+        "id": "menu-07",
+        "name": "Woodfired Margherita Pizza",
+        "category": "Main Course",
+        "price_lkr": 2100.0,
+        "prep_time_mins": 11,
+        "station_id": "station-4",
+        "station_name": "Pizza",
+        "image_url": "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=500&auto=format&fit=crop&q=80",
+        "description": "Stone-baked sourdough crust topped with San Marzano tomatoes, fresh mozzarella, and sweet basil.",
+        "recipe_bom": [
+            {"ingredient_name": "Aged Cheddar & Mozzarella Blocks", "category": "Dairy", "required_kg": 0.20}
+        ]
+    },
+    {
+        "id": "menu-08",
+        "name": "Crispy Golden Calamari & Fries",
+        "category": "Sides & Starters",
+        "price_lkr": 1650.0,
+        "prep_time_mins": 7,
+        "station_id": "station-5",
+        "station_name": "Fryer",
+        "image_url": "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?w=500&auto=format&fit=crop&q=80",
+        "description": "Golden battered flash-fried calamari and hand-cut fries dusted with sea salt and smoked paprika.",
+        "recipe_bom": [
+            {"ingredient_name": "Fresh Atlantic Salmon Fillet", "category": "Fish", "required_kg": 0.20}
         ]
     }
 ]
@@ -137,7 +165,7 @@ INITIAL_ORDERS = [
         "status": "in_prep",
         "table_status": "occupied",
         "station_id": "station-1",
-        "station_name": "Hot Wok & Kottu Station",
+        "station_name": "Hot Kitchen",
         "created_at": (datetime.now() - timedelta(minutes=6)).strftime("%H:%M:%S"),
         "elapsed_mins": 6,
         "target_prep_mins": 8,
@@ -160,8 +188,8 @@ INITIAL_ORDERS = [
         "total_amount_lkr": 3830.0,
         "status": "in_prep",
         "table_status": "occupied",
-        "station_id": "station-3",
-        "station_name": "Grill & Seafood Station",
+        "station_id": "station-2",
+        "station_name": "Grill",
         "created_at": (datetime.now() - timedelta(minutes=10)).strftime("%H:%M:%S"),
         "elapsed_mins": 10,
         "target_prep_mins": 14,
@@ -183,7 +211,7 @@ INITIAL_ORDERS = [
         "status": "ready",
         "table_status": "not_applicable",
         "station_id": "station-1",
-        "station_name": "Hot Wok & Kottu Station",
+        "station_name": "Hot Kitchen",
         "created_at": (datetime.now() - timedelta(minutes=18)).strftime("%H:%M:%S"),
         "elapsed_mins": 18,
         "target_prep_mins": 6,
@@ -204,8 +232,8 @@ INITIAL_ORDERS = [
         "total_amount_lkr": 3200.0,
         "status": "completed",
         "table_status": "dining",
-        "station_id": "station-3",
-        "station_name": "Grill & Seafood Station",
+        "station_id": "station-2",
+        "station_name": "Grill",
         "created_at": (datetime.now() - timedelta(minutes=35)).strftime("%H:%M:%S"),
         "elapsed_mins": 35,
         "target_prep_mins": 15,
@@ -337,7 +365,7 @@ def place_new_order(payload: CreateOrderPayload):
     total_amount = 0.0
     deducted_log = []
     primary_station_id = "station-1"
-    primary_station_name = "Hot Wok & Kottu Station"
+    primary_station_name = "Hot Kitchen"
     max_prep_time = 6
 
     for it in payload.items:
