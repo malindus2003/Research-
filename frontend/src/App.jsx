@@ -38,6 +38,7 @@ export default function App() {
   const [currentVisionFeatures, setCurrentVisionFeatures] = useState(null);
   const [showAlertsCenter, setShowAlertsCenter] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     fetchAllData();
@@ -54,6 +55,7 @@ export default function App() {
   }, [isDarkMode]);
 
   const fetchAllData = async () => {
+    setRefreshTrigger(prev => prev + 1);
     try {
       const [statsRes, zonesRes, invRes, recsRes] = await Promise.all([
         axios.get("http://localhost:8000/api/dashboard/stats"),
@@ -140,6 +142,7 @@ export default function App() {
             isDarkMode={isDarkMode}
             currentRole={currentRole}
             viewMode={activeModule === 'orders' ? 'all' : activeModule}
+            refreshTrigger={refreshTrigger}
           />
         )}
 
