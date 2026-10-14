@@ -55,6 +55,130 @@ export const ROLES = [
   }
 ];
 
+// ROLE-SPECIFIC DOCK MODULE DEFINITIONS (1 Screen = 1 Dedicated Purpose)
+export const getModulesForRole = (currentRole = 'admin', stats = null) => {
+  if (currentRole === 'cashier') {
+    return [
+      {
+        id: 'pos_menu',
+        label: 'POS Menu Ordering',
+        shortLabel: 'POS Menu',
+        badge: 'Order',
+        badgeColor: 'bg-emerald-600',
+        icon: <Utensils className="h-3.5 w-3.5" />
+      },
+      {
+        id: 'tables_map',
+        label: 'Restaurant Table Map',
+        shortLabel: 'Table Map',
+        icon: <Armchair className="h-3.5 w-3.5" />
+      },
+      {
+        id: 'orders_ledger',
+        label: 'Orders & Sales Ledger',
+        shortLabel: 'Sales Ledger',
+        icon: <Receipt className="h-3.5 w-3.5" />
+      }
+    ];
+  }
+
+  if (currentRole === 'staff') {
+    return [
+      {
+        id: 'kds',
+        label: 'Kitchen Display (KDS)',
+        shortLabel: 'KDS Tickets',
+        badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
+        badgeColor: 'bg-amber-500',
+        icon: <Flame className="h-3.5 w-3.5" />
+      },
+      {
+        id: 'demand',
+        label: 'Daily Prep Guidance',
+        shortLabel: 'Prep Guide',
+        icon: <Utensils className="h-3.5 w-3.5" />
+      },
+      {
+        id: 'kitchen',
+        label: 'Kitchen Stations & Line',
+        shortLabel: 'Stations',
+        icon: <Users className="h-3.5 w-3.5" />
+      },
+      {
+        id: 'inventory',
+        label: 'Perishable Inventory',
+        shortLabel: 'Inventory',
+        icon: <Package className="h-3.5 w-3.5" />
+      },
+      {
+        id: 'spoilage',
+        label: 'Food Spoilage & Quality',
+        shortLabel: 'Spoilage',
+        badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
+        badgeColor: 'bg-rose-500',
+        icon: <Cpu className="h-3.5 w-3.5" />
+      },
+      {
+        id: 'waste',
+        label: 'Smart Waste Bin',
+        shortLabel: 'Waste Bin',
+        icon: <Trash2 className="h-3.5 w-3.5" />
+      }
+    ];
+  }
+
+  // Default: Admin (Full Access to all 7 core modules)
+  return [
+    { 
+      id: 'executive', 
+      label: 'Executive Hub', 
+      shortLabel: 'Executive', 
+      badge: 'Core',
+      icon: <Layers className="h-3.5 w-3.5" /> 
+    },
+    { 
+      id: 'orders', 
+      label: 'Orders & POS', 
+      shortLabel: 'Orders', 
+      badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
+      badgeColor: 'bg-blue-500',
+      icon: <ShoppingBag className="h-3.5 w-3.5" /> 
+    },
+    { 
+      id: 'inventory', 
+      label: 'Inventory & Stock', 
+      shortLabel: 'Inventory', 
+      icon: <Package className="h-3.5 w-3.5" /> 
+    },
+    { 
+      id: 'spoilage', 
+      label: 'Food Spoilage & Quality', 
+      shortLabel: 'Spoilage', 
+      badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
+      badgeColor: 'bg-rose-500',
+      icon: <Cpu className="h-3.5 w-3.5" /> 
+    },
+    { 
+      id: 'kitchen', 
+      label: 'Kitchen & Staff', 
+      shortLabel: 'Kitchen', 
+      icon: <Users className="h-3.5 w-3.5" /> 
+    },
+    { 
+      id: 'demand', 
+      label: 'Demand Forecasting', 
+      shortLabel: 'Demand', 
+      icon: <TrendingUp className="h-3.5 w-3.5" /> 
+    },
+    { 
+      id: 'waste', 
+      label: 'Smart Waste Bin', 
+      shortLabel: 'Waste Bin', 
+      icon: <Trash2 className="h-3.5 w-3.5" /> 
+    }
+  ];
+};
+
 export default function Header({
   activeModule,
   onSelectModule,
@@ -81,133 +205,9 @@ export default function Header({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ROLE-SPECIFIC DOCK MODULE DEFINITIONS (1 Screen = 1 Dedicated Purpose)
-  const getModulesForRole = () => {
-
-    if (currentRole === 'cashier') {
-      return [
-        {
-          id: 'pos_menu',
-          label: 'POS Menu Ordering',
-          shortLabel: 'POS Menu',
-          badge: 'Order',
-          badgeColor: 'bg-emerald-600',
-          icon: <Utensils className="h-3.5 w-3.5" />
-        },
-        {
-          id: 'tables_map',
-          label: 'Restaurant Table Map',
-          shortLabel: 'Table Map',
-          icon: <Armchair className="h-3.5 w-3.5" />
-        },
-        {
-          id: 'orders_ledger',
-          label: 'Orders & Sales Ledger',
-          shortLabel: 'Sales Ledger',
-          icon: <Receipt className="h-3.5 w-3.5" />
-        }
-      ];
-    }
-
-    if (currentRole === 'staff') {
-      return [
-        {
-          id: 'kds',
-          label: 'Kitchen Display (KDS)',
-          shortLabel: 'KDS Tickets',
-          badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
-          badgeColor: 'bg-amber-500',
-          icon: <Flame className="h-3.5 w-3.5" />
-        },
-        {
-          id: 'demand',
-          label: 'Daily Prep Guidance',
-          shortLabel: 'Prep Guide',
-          icon: <Utensils className="h-3.5 w-3.5" />
-        },
-        {
-          id: 'kitchen',
-          label: 'Kitchen Stations & Line',
-          shortLabel: 'Stations',
-          icon: <Users className="h-3.5 w-3.5" />
-        },
-        {
-          id: 'inventory',
-          label: 'Perishable Inventory',
-          shortLabel: 'Inventory',
-          icon: <Package className="h-3.5 w-3.5" />
-        },
-        {
-          id: 'spoilage',
-          label: 'Food Spoilage & Quality',
-          shortLabel: 'Spoilage',
-          badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
-          badgeColor: 'bg-rose-500',
-          icon: <Cpu className="h-3.5 w-3.5" />
-        },
-        {
-          id: 'waste',
-          label: 'Smart Waste Bin',
-          shortLabel: 'Waste Bin',
-          icon: <Trash2 className="h-3.5 w-3.5" />
-        }
-      ];
-    }
-
-    // Default: Admin (Full Access to all 7 core modules)
-    return [
-      { 
-        id: 'executive', 
-        label: 'Executive Hub', 
-        shortLabel: 'Executive', 
-        badge: 'Core',
-        icon: <Layers className="h-3.5 w-3.5" /> 
-      },
-      { 
-        id: 'orders', 
-        label: 'Orders & POS', 
-        shortLabel: 'Orders', 
-        badge: stats?.active_kitchen_tickets ? `${stats.active_kitchen_tickets}` : null,
-        badgeColor: 'bg-blue-500',
-        icon: <ShoppingBag className="h-3.5 w-3.5" /> 
-      },
-      { 
-        id: 'inventory', 
-        label: 'Inventory & Stock', 
-        shortLabel: 'Inventory', 
-        icon: <Package className="h-3.5 w-3.5" /> 
-      },
-      { 
-        id: 'spoilage', 
-        label: 'Food Spoilage & Quality', 
-        shortLabel: 'Food Spoilage', 
-        badge: stats?.critical_batches ? `${stats.critical_batches}` : null,
-        badgeColor: 'bg-rose-500',
-        icon: <Cpu className="h-3.5 w-3.5" /> 
-      },
-      { 
-        id: 'kitchen', 
-        label: 'Kitchen & Staff', 
-        shortLabel: 'Kitchen', 
-        icon: <Users className="h-3.5 w-3.5" /> 
-      },
-      { 
-        id: 'demand', 
-        label: 'Demand Forecasting', 
-        shortLabel: 'Demand', 
-        icon: <TrendingUp className="h-3.5 w-3.5" /> 
-      },
-      { 
-        id: 'waste', 
-        label: 'Smart Waste Bin', 
-        shortLabel: 'Waste Bin', 
-        icon: <Trash2 className="h-3.5 w-3.5" /> 
-      }
-    ];
-  };
-
-  const visibleModules = getModulesForRole();
+  const visibleModules = getModulesForRole(currentRole, stats);
   const activeRoleObj = ROLES.find(r => r.id === currentRole) || ROLES[0];
+  const currentModuleObj = visibleModules.find(m => m.id === activeModule) || visibleModules[0];
 
   const handleRoleSwitch = (role) => {
     if (onSelectRole) {
@@ -218,53 +218,56 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/90 dark:bg-slate-950/90 border-b border-[#cbdad0]/80 dark:border-slate-800/80 transition-colors shadow-sm">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-2.5 space-y-2">
+    <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/95 dark:bg-slate-950/95 border-b border-[#cbdad0]/80 dark:border-slate-800/80 transition-colors shadow-sm pt-[max(env(safe-area-inset-top),12px)]">
+      <div className="max-w-[1600px] mx-auto px-2.5 sm:px-6 py-2 sm:py-2.5 space-y-2">
         
         {/* Top Tier: Brand Identity, Role Switcher Dropdown & Tools */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2">
           
           {/* Brand Logo with Live Telemetry Pulse */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="relative">
-              <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 flex items-center justify-center shadow-lg shadow-emerald-700/25 text-white font-black">
-                <Activity className="h-4.5 w-4.5" />
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink min-w-0">
+            <div className="relative flex-shrink-0">
+              <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 flex items-center justify-center shadow-md shadow-emerald-700/25 text-white font-black">
+                <Activity className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+              <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white dark:border-slate-950"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-500 border-2 border-white dark:border-slate-950"></span>
               </span>
             </div>
 
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-black tracking-tight text-slate-900 dark:text-white leading-none">
-                  Smart Restaurant Analytics
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h1 className="text-xs sm:text-base font-black tracking-tight text-slate-900 dark:text-white leading-tight truncate">
+                  Smart Restaurant
                 </h1>
                 <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                   <Sparkles className="h-2.5 w-2.5 text-emerald-600 dark:text-emerald-400" /> AI & IoT Cloud Core
                 </span>
               </div>
+              {/* Mobile Active Module Pill */}
+              <div className="sm:hidden flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 truncate">
+                <span>{currentModuleObj?.shortLabel || currentModuleObj?.label}</span>
+              </div>
             </div>
           </div>
 
           {/* Right Tools & Role Dropdown */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             
             {/* ROLE SELECTOR DROPDOWN */}
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                className={`px-3 py-1.5 rounded-xl border text-xs font-black flex items-center gap-2 transition-all shadow-sm hover:scale-105 ${activeRoleObj.badgeColor} bg-white dark:bg-slate-900`}
+                className={`px-2 sm:px-3 py-1.5 rounded-xl border text-[11px] sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all shadow-xs ${activeRoleObj.badgeColor} bg-white dark:bg-slate-900`}
                 title="Switch User Role / View"
               >
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 sm:gap-1.5">
                   {activeRoleObj.icon}
-                  <span className="hidden sm:inline">Role:</span>
                   <span className="font-extrabold">{activeRoleObj.shortTitle}</span>
                 </div>
-                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${roleDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform duration-200 ${roleDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Dropdown Menu Modal */}
@@ -311,20 +314,20 @@ export default function Header({
             {/* Theme Toggle Button */}
             <button
               onClick={onToggleTheme}
-              className="p-2 rounded-xl bg-[#f0f5f2] hover:bg-[#e4ece7] dark:bg-slate-900 dark:hover:bg-slate-800 border border-[#d5e2d9] dark:border-slate-800 text-slate-700 dark:text-slate-200 transition-all hover:scale-105 shadow-sm"
+              className="p-1.5 sm:p-2 rounded-xl bg-[#f0f5f2] hover:bg-[#e4ece7] dark:bg-slate-900 dark:hover:bg-slate-800 border border-[#d5e2d9] dark:border-slate-800 text-slate-700 dark:text-slate-200 transition-all shadow-xs"
               title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {isDarkMode ? (
-                <Sun className="h-4 w-4 text-amber-400 transition-transform rotate-0 hover:rotate-90 duration-300" />
+                <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-400" />
               ) : (
-                <Moon className="h-4 w-4 text-emerald-800 transition-transform rotate-0 hover:-rotate-12 duration-300" />
+                <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-800" />
               )}
             </button>
 
-            {/* Refresh Button */}
+            {/* Refresh Button (visible on tablet/desktop) */}
             <button
               onClick={onRefresh}
-              className="p-2 rounded-xl bg-[#f0f5f2] hover:bg-[#e4ece7] dark:bg-slate-900 dark:hover:bg-slate-800 border border-[#d5e2d9] dark:border-slate-800 text-slate-700 dark:text-slate-200 transition-all hover:scale-105 shadow-sm"
+              className="hidden sm:flex p-2 rounded-xl bg-[#f0f5f2] hover:bg-[#e4ece7] dark:bg-slate-900 dark:hover:bg-slate-800 border border-[#d5e2d9] dark:border-slate-800 text-slate-700 dark:text-slate-200 transition-all shadow-xs"
               title="Refresh Real-Time Metrics"
             >
               <RefreshCw className="h-4 w-4 text-emerald-800 dark:text-slate-200" />
@@ -333,16 +336,16 @@ export default function Header({
             {/* Interactive Alert Center Trigger */}
             <button
               onClick={onOpenAlerts}
-              className="relative px-3 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs transition-all hover:scale-105 shadow-md shadow-emerald-800/20 flex items-center gap-2"
+              className="relative px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-[11px] sm:text-xs transition-all shadow-xs flex items-center gap-1 sm:gap-1.5"
             >
-              <Bell className="h-4 w-4" />
+              <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Alerts</span>
               {activeAlertCount > 0 ? (
-                <span className="flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-rose-600 text-[10px] font-black text-white shadow">
+                <span className="flex h-4 min-w-[16px] sm:h-5 sm:min-w-[20px] px-1 items-center justify-center rounded-full bg-rose-600 text-[9px] sm:text-[10px] font-black text-white shadow">
                   {activeAlertCount}
                 </span>
               ) : (
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-400" />
               )}
             </button>
 
@@ -350,8 +353,8 @@ export default function Header({
 
         </div>
 
-        {/* Bottom Tier: Floating Segmented Dock Tailored by Selected Role */}
-        <div className="p-1 rounded-2xl bg-[#edf4f0] dark:bg-slate-900/90 border border-[#d1ded5] dark:border-slate-800/90 shadow-inner">
+        {/* Desktop / Tablet Tier: Floating Segmented Dock Tailored by Selected Role */}
+        <div className="hidden sm:block p-1 rounded-2xl bg-[#edf4f0] dark:bg-slate-900/90 border border-[#d1ded5] dark:border-slate-800/90 shadow-inner">
           <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
             {visibleModules.map((m) => {
               const isActive = activeModule === m.id;

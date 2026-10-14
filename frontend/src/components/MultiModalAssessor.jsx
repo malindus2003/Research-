@@ -138,41 +138,64 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
   };
 
   return (
-    <div className="glass-panel p-6 rounded-2xl space-y-5 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e1eae4] dark:border-slate-800 pb-5">
+    <div className="glass-panel p-3.5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3.5 sm:space-y-5 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-[#e1eae4] dark:border-slate-800 pb-3 sm:pb-5">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Universal AI Spoilage & Shelf-Life Assessor</h2>
-            <span className="text-xs px-2.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold flex items-center gap-1">
-              <Cpu className="h-3.5 w-3.5" /> Multi-Modal Fusion Engine
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Universal AI Spoilage & Shelf-Life Assessor</h2>
+            <span className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold flex items-center gap-1">
+              <Cpu className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> Fusion Engine
             </span>
           </div>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">
+          <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">
             Merges physical gas & climate sensors with visual CV indicators across Fruits, Veg, Dairy, Fish & Meat
           </p>
         </div>
       </div>
 
-      {/* Preset Quick Buttons */}
-      <div>
-        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Quick Test Presets:</span>
-        <div className="flex flex-wrap gap-2 mt-2">
+      {/* Preset Quick Select Dropdown & Buttons */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-[#f8faf9] dark:bg-slate-800/60 border border-[#d1ded5] dark:border-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+            Quick Food Preset:
+          </span>
+          <select
+            value={itemName}
+            onChange={(e) => {
+              const p = QUICK_PRESETS.find(item => item.name === e.target.value);
+              if (p) applyPreset(p);
+            }}
+            className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-[#c6d7cd] dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white shadow-2xs focus:outline-none focus:border-emerald-600"
+          >
+            {QUICK_PRESETS.map((p, idx) => (
+              <option key={idx} value={p.name}>
+                {p.name} ({p.category})
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
           {QUICK_PRESETS.map((p, idx) => (
             <button
               key={idx}
+              type="button"
               onClick={() => applyPreset(p)}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 border border-[#d1ded5] dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 transition-all shadow-sm"
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap border ${
+                itemName === p.name
+                  ? 'bg-emerald-700 text-white border-emerald-700 shadow-2xs'
+                  : 'bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-slate-800 border-[#d1ded5] dark:border-slate-700 text-slate-700 dark:text-slate-300'
+              }`}
             >
-              {p.name} ({p.category})
+              {p.name}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-2">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-6 mt-1 sm:mt-2">
         
         {/* Controls & Simulators */}
-        <div className="lg:col-span-6 space-y-4 bg-[#f8faf9] dark:bg-slate-800/80 p-5 rounded-2xl border border-[#d1ded5] dark:border-slate-700 shadow-sm">
+        <div className="lg:col-span-6 space-y-3.5 sm:space-y-4 bg-[#f8faf9] dark:bg-slate-800/80 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-[#d1ded5] dark:border-slate-700 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <Sliders className="h-4 w-4 text-emerald-700 dark:text-emerald-400" /> Multi-Source Input Parameters
@@ -356,40 +379,40 @@ export default function MultiModalAssessor({ currentVisionFeatures, selectedZone
         </div>
 
         {/* Prediction Results & Remaining Shelf Life Breakdown */}
-        <div className="lg:col-span-6 flex flex-col justify-between space-y-4">
+        <div className="lg:col-span-6 flex flex-col justify-between space-y-3 sm:space-y-4">
           {prediction && (
-            <div className="bg-white dark:bg-slate-800/90 p-5 rounded-2xl border border-[#d1ded5] dark:border-slate-700 flex flex-col h-full justify-between shadow-sm space-y-4">
+            <div className="bg-white dark:bg-slate-800/90 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-[#d1ded5] dark:border-slate-700 flex flex-col h-full justify-between shadow-xs space-y-3 sm:space-y-4">
               
               <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">
-                    {prediction.category} Spoilage & Shelf-Life Assessment
+                <div className="flex flex-wrap items-center justify-between gap-1.5">
+                  <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">
+                    {prediction.category} Spoilage & RSL Assessment
                   </span>
                   {getRiskBadge(prediction.risk_level)}
                 </div>
 
                 {/* Big Metric Gauges */}
-                <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="p-4 rounded-xl bg-[#ecfdf5] dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 shadow-sm">
-                    <span className="text-xs text-emerald-900 dark:text-emerald-300 font-bold flex items-center gap-1">
-                      <Hourglass className="h-4 w-4 text-emerald-700 dark:text-emerald-400" /> Remaining Shelf-Life
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-3 sm:mt-4">
+                  <div className="p-3 sm:p-4 rounded-xl bg-[#ecfdf5] dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 shadow-2xs">
+                    <span className="text-[11px] sm:text-xs text-emerald-900 dark:text-emerald-300 font-bold flex items-center gap-1">
+                      <Hourglass className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-700 dark:text-emerald-400" /> Remaining Shelf-Life
                     </span>
-                    <div className="text-3xl font-black text-emerald-800 dark:text-emerald-400 mt-1">
-                      {prediction.remaining_shelf_life_hours} <span className="text-sm font-normal text-slate-600 dark:text-slate-400">hrs</span>
+                    <div className="text-2xl sm:text-3xl font-black text-emerald-800 dark:text-emerald-400 mt-1">
+                      {prediction.remaining_shelf_life_hours} <span className="text-xs sm:text-sm font-normal text-slate-600 dark:text-slate-400">hrs</span>
                     </div>
-                    <span className="text-xs text-emerald-700 dark:text-emerald-400 mt-1 block font-semibold">
+                    <span className="text-[10px] sm:text-xs text-emerald-700 dark:text-emerald-400 mt-0.5 sm:mt-1 block font-semibold">
                       Approx. {(prediction.remaining_shelf_life_hours / 24.0).toFixed(1)} days usable
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-sm">
-                    <span className="text-xs text-slate-600 dark:text-slate-400 font-bold">Spoilage Probability</span>
-                    <div className="text-3xl font-black text-rose-600 dark:text-rose-400 mt-1">
-                      {prediction.spoilage_probability} <span className="text-sm font-normal text-slate-500">%</span>
+                  <div className="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-2xs">
+                    <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 font-bold">Spoilage Probability</span>
+                    <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 mt-1">
+                      {prediction.spoilage_probability} <span className="text-xs sm:text-sm font-normal text-slate-500">%</span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-2 overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 sm:h-2 mt-1.5 sm:mt-2 overflow-hidden">
                       <div 
-                        className="bg-gradient-to-r from-emerald-600 via-amber-500 to-rose-600 h-2 rounded-full" 
+                        className="bg-gradient-to-r from-emerald-600 via-amber-500 to-rose-600 h-full rounded-full" 
                         style={{ width: `${Math.min(100, prediction.spoilage_probability)}%` }}
                       />
                     </div>

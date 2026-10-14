@@ -17,7 +17,7 @@ MENU_ITEMS = [
         "prep_time_mins": 8,
         "station_id": "station-1",
         "station_name": "Hot Wok & Kottu Station",
-        "image_url": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&auto=format&fit=crop&q=80",
+        "image_url": "/images/dishes/dish_1.jpg",
         "description": "Flaky godamba roti shredded with spiced fresh chicken breast, carrots, leeks, and egg.",
         "recipe_bom": [
             {"ingredient_name": "Fresh Chicken Breast (Chilled)", "category": "Meat", "required_kg": 0.30},
@@ -32,7 +32,7 @@ MENU_ITEMS = [
         "prep_time_mins": 14,
         "station_id": "station-3",
         "station_name": "Grill & Seafood Station",
-        "image_url": "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500&auto=format&fit=crop&q=80",
+        "image_url": "/images/dishes/dish_2.jpg",
         "description": "Pan-seared Atlantic salmon fillet served with garlic herb butter and fresh garden greens.",
         "recipe_bom": [
             {"ingredient_name": "Fresh Atlantic Salmon Fillet", "category": "Fish", "required_kg": 0.35},
@@ -47,7 +47,7 @@ MENU_ITEMS = [
         "prep_time_mins": 6,
         "station_id": "station-1",
         "station_name": "Hot Wok & Kottu Station",
-        "image_url": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=500&auto=format&fit=crop&q=80",
+        "image_url": "/images/dishes/dish_3.jpg",
         "description": "Crisp Belgian waffle topped with sliced ripe bananas, wild berries, honey, and fresh whipped cream.",
         "recipe_bom": [
             {"ingredient_name": "Cavendish Ripe Bananas (Crate)", "category": "Fruits", "required_kg": 0.25},
@@ -63,7 +63,7 @@ MENU_ITEMS = [
         "prep_time_mins": 4,
         "station_id": "station-4",
         "station_name": "Salad & Cold Prep Station",
-        "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=80",
+        "image_url": "/images/dishes/dish_4.jpg",
         "description": "Fresh romaine lettuce, baby spinach leaves, ripe vine tomatoes, and aged cheese shavings.",
         "recipe_bom": [
             {"ingredient_name": "Hydroponic Romaine Lettuce (Crisp)", "category": "Vegetables", "required_kg": 0.20},
@@ -79,7 +79,7 @@ MENU_ITEMS = [
         "prep_time_mins": 15,
         "station_id": "station-3",
         "station_name": "Grill & Seafood Station",
-        "image_url": "https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=500&auto=format&fit=crop&q=80",
+        "image_url": "/images/dishes/dish_5.jpg",
         "description": "Chargrilled prime grass-fed beef sirloin with roasted tomatoes, red wine reduction, and herbs.",
         "recipe_bom": [
             {"ingredient_name": "Prime Beef Sirloin (Vac-Pack)", "category": "Meat", "required_kg": 0.35},
@@ -94,12 +94,102 @@ MENU_ITEMS = [
         "prep_time_mins": 5,
         "station_id": "station-4",
         "station_name": "Salad & Cold Prep Station",
-        "image_url": "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=500&auto=format&fit=crop&q=80",
+        "image_url": "/images/dishes/dish_6.jpg",
         "description": "Blended ripe bananas and fresh strawberries with pasteurized whole milk, chia seeds, and granola.",
         "recipe_bom": [
             {"ingredient_name": "Cavendish Ripe Bananas (Crate)", "category": "Fruits", "required_kg": 0.20},
             {"ingredient_name": "Fresh Farm Strawberries (Punnet)", "category": "Fruits", "required_kg": 0.15},
             {"ingredient_name": "Pasteurized Whole Milk (Bulk)", "category": "Dairy", "required_kg": 0.15}
+        ]
+    },
+    {
+        "id": "menu-07",
+        "name": "Seafood Nasi Goreng & Calamari",
+        "category": "Seafood",
+        "price_lkr": 1950.0,
+        "prep_time_mins": 9,
+        "station_id": "station-1",
+        "station_name": "Hot Wok & Kottu Station",
+        "image_url": "/images/dishes/dish_7.jpg",
+        "description": "Wok-fried jasmine rice with calamari rings, prawns, chili sambal, fried egg, and prawn crackers.",
+        "recipe_bom": [
+            {"ingredient_name": "Fresh Atlantic Salmon Fillet", "category": "Fish", "required_kg": 0.20},
+            {"ingredient_name": "Baby Spinach Leaves (Crisp)", "category": "Vegetables", "required_kg": 0.08}
+        ]
+    },
+    {
+        "id": "menu-08",
+        "name": "Crispy Devilled Chicken & Fragrant Rice",
+        "category": "Main Course",
+        "price_lkr": 1650.0,
+        "prep_time_mins": 11,
+        "station_id": "station-1",
+        "station_name": "Hot Wok & Kottu Station",
+        "image_url": "/images/dishes/dish_8.jpg",
+        "description": "Crispy battered chicken tossed in sweet spicy capsicum, tomato gravy, and served with basmati rice.",
+        "recipe_bom": [
+            {"ingredient_name": "Fresh Chicken Breast (Chilled)", "category": "Meat", "required_kg": 0.35},
+            {"ingredient_name": "Hydroponic Romaine Lettuce (Crisp)", "category": "Vegetables", "required_kg": 0.10}
+        ]
+    },
+    {
+        "id": "menu-09",
+        "name": "Garlic Butter Jumbo King Prawns",
+        "category": "Seafood",
+        "price_lkr": 2650.0,
+        "prep_time_mins": 12,
+        "station_id": "station-3",
+        "station_name": "Grill & Seafood Station",
+        "image_url": "/images/dishes/dish_9.jpg",
+        "description": "Succulent grilled sea prawns tossed in roasted garlic butter, parsley, and toasted garlic sourdough.",
+        "recipe_bom": [
+            {"ingredient_name": "Fresh Atlantic Salmon Fillet", "category": "Fish", "required_kg": 0.30},
+            {"ingredient_name": "Hydroponic Romaine Lettuce (Crisp)", "category": "Vegetables", "required_kg": 0.10}
+        ]
+    },
+    {
+        "id": "menu-10",
+        "name": "Stone-Baked Artisan Pizza",
+        "category": "Main Course",
+        "price_lkr": 2100.0,
+        "prep_time_mins": 14,
+        "station_id": "station-1",
+        "station_name": "Hot Wok & Kottu Station",
+        "image_url": "/images/dishes/dish_10.jpg",
+        "description": "Handcrafted thin crust dough topped with crushed San Marzano tomatoes, fresh mozzarella, and basil.",
+        "recipe_bom": [
+            {"ingredient_name": "Aged Cheddar & Mozzarella Blocks", "category": "Dairy", "required_kg": 0.20},
+            {"ingredient_name": "Hydroponic Romaine Lettuce (Crisp)", "category": "Vegetables", "required_kg": 0.05}
+        ]
+    },
+    {
+        "id": "menu-11",
+        "name": "Mediterranean Greek Feta Salad",
+        "category": "Healthy & Salads",
+        "price_lkr": 1250.0,
+        "prep_time_mins": 5,
+        "station_id": "station-4",
+        "station_name": "Salad & Cold Prep Station",
+        "image_url": "/images/dishes/dish_11.jpg",
+        "description": "Vine-ripened tomatoes, crisp cucumbers, Kalamata olives, and creamy feta cheese drizzled with extra virgin olive oil.",
+        "recipe_bom": [
+            {"ingredient_name": "Hydroponic Romaine Lettuce (Crisp)", "category": "Vegetables", "required_kg": 0.20},
+            {"ingredient_name": "Aged Cheddar & Mozzarella Blocks", "category": "Dairy", "required_kg": 0.10}
+        ]
+    },
+    {
+        "id": "menu-12",
+        "name": "Iced Passionfruit & Lime Cooler",
+        "category": "Beverages & Breakfast",
+        "price_lkr": 650.0,
+        "prep_time_mins": 3,
+        "station_id": "station-4",
+        "station_name": "Salad & Cold Prep Station",
+        "image_url": "/images/dishes/dish_12.jpg",
+        "description": "Refreshing fresh passionfruit pulp with muddled garden mint, sparkling soda, and crushed ice.",
+        "recipe_bom": [
+            {"ingredient_name": "Cavendish Ripe Bananas (Crate)", "category": "Fruits", "required_kg": 0.10},
+            {"ingredient_name": "Fresh Farm Strawberries (Punnet)", "category": "Fruits", "required_kg": 0.05}
         ]
     }
 ]

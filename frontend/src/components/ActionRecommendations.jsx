@@ -64,16 +64,16 @@ export default function ActionRecommendations({ recommendations, onOpenAlertsCen
   };
 
   return (
-    <div className="glass-panel p-6 rounded-2xl space-y-5 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e1eae4] dark:border-slate-800 pb-4">
+    <div className="glass-panel p-3.5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3.5 sm:space-y-5 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 border-b border-[#e1eae4] dark:border-slate-800 pb-3 sm:pb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Active Intelligent Alert Directives</h2>
-            <span className="text-xs px-2.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold flex items-center gap-1">
-              <Sparkles className="h-3.5 w-3.5" /> Real-Time Decision Support
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Active Intelligent Alert Directives</h2>
+            <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold flex items-center gap-1">
+              <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> Real-Time Decision Support
             </span>
           </div>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">
+          <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium leading-relaxed">
             Automated recommendations for culinary ingredient routing, temperature stabilization, and batch isolation
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function ActionRecommendations({ recommendations, onOpenAlertsCen
         {onOpenAlertsCenter && (
           <button
             onClick={onOpenAlertsCenter}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors border border-slate-300 dark:border-slate-700 shadow-sm"
+            className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors border border-slate-300 dark:border-slate-700 shadow-sm"
           >
             <span>Open Alert Center</span>
             <ExternalLink className="h-3.5 w-3.5" />

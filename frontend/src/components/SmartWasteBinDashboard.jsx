@@ -84,42 +84,47 @@ export default function SmartWasteBinDashboard({ isDarkMode }) {
     <div className="space-y-6">
       
       {/* Top Banner */}
-      <div className="glass-panel p-6 rounded-2xl space-y-5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="glass-panel p-3.5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3.5 sm:space-y-5 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 border-b border-slate-200 dark:border-slate-800 pb-3 sm:pb-4">
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Three-Bin Waste Identification & Monitoring</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 font-bold">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Three-Bin Waste Identification & Monitoring</h2>
+              <span className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 font-bold">
                 Food Analytics & Recycling Alerts
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
               Dedicated Food, Plastic, and Paper bins with IoT weight sensing, fill-level monitoring, and full-bin quotation alerts
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <button
-              type="button"
-              onClick={() => setIsCompanyRegistrationOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20"
-            >
-              <Building2 className="h-4 w-4" /> Register Recycling Company
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsRegistrationOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-rose-600 px-3.5 py-2.5 text-xs font-bold text-white shadow-lg shadow-rose-600/20 transition hover:bg-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-400"
-            >
-              <Plus className="h-4 w-4" /> Add Wastage
-            </button>
-            <div className="text-right">
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Total Food Waste Today</span>
-              <div className="text-xl font-black text-rose-600 dark:text-rose-400">{data.total_food_waste_today_kg} kg</div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsCompanyRegistrationOpen(true)}
+                className="flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 shadow-2xs transition hover:bg-emerald-100 focus:outline-none dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 cursor-pointer"
+              >
+                <Building2 className="h-3.5 w-3.5" /> Register Recycler
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsRegistrationOpen(true)}
+                className="flex items-center gap-1.5 rounded-xl bg-rose-600 px-3 py-2 text-xs font-bold text-white shadow-md shadow-rose-600/20 transition hover:bg-rose-500 focus:outline-none cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add Wastage
+              </button>
             </div>
-            <div className="text-right border-l border-slate-200 dark:border-slate-800 pl-4">
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Direct Cost Loss</span>
-              <div className="text-xl font-black text-amber-600 dark:text-amber-400">{data.total_cost_loss_today}</div>
+            
+            <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+              <div>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase block">Total Food Waste</span>
+                <div className="text-base sm:text-xl font-black text-rose-600 dark:text-rose-400">{data.total_food_waste_today_kg} kg</div>
+              </div>
+              <div className="border-l border-slate-200 dark:border-slate-800 pl-3">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase block">Cost Loss</span>
+                <div className="text-base sm:text-xl font-black text-amber-600 dark:text-amber-400">{data.total_cost_loss_today}</div>
+              </div>
             </div>
           </div>
         </div>

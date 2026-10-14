@@ -87,42 +87,42 @@ export default function ESP32Simulator({ zones, onTelemetrySent, isDarkMode }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       
-      {/* Simulator Control Panel */}
-      <div className="glass-panel p-6 rounded-2xl space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      {/* Node Control Unit */}
+      <div className="glass-panel p-3.5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3.5 sm:space-y-4 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 border-b border-[#e1eae4] dark:border-slate-800 pb-3 sm:pb-4">
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">ESP32 Microcontroller Hardware Simulator</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 border border-sky-200 dark:border-sky-500/20 font-mono font-bold">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">ESP32 Microcontroller Hardware Simulator</h2>
+              <span className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 border border-sky-200 dark:border-sky-500/20 font-mono font-bold">
                 POST /api/sensors/telemetry
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
               Emulate real-time wireless packets transmitted by ESP32 sensor nodes in storage containers
             </p>
           </div>
 
           {/* Quick Trigger Presets */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => simulatePreset("anomaly")}
-              className="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30 text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
             >
-              <Flame className="h-4 w-4 text-rose-600 dark:text-rose-400" /> Simulate Spoilage Anomaly
+              <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-rose-600 dark:text-rose-400" /> Simulate Spoilage Anomaly
             </button>
             <button
               onClick={() => simulatePreset("normal")}
-              className="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
             >
-              <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> Reset Baseline
+              <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 dark:text-emerald-400" /> Reset Baseline
             </button>
           </div>
         </div>
 
         {/* Input Parameters Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 mt-4 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mt-3 sm:mt-4 text-xs">
           <div>
             <label className="text-slate-700 dark:text-slate-300 font-bold block mb-1">Target Storage Node</label>
             <select
@@ -184,15 +184,15 @@ export default function ESP32Simulator({ zones, onTelemetrySent, isDarkMode }) {
             <button
               onClick={() => handleSendTelemetry()}
               disabled={sending}
-              className="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-sky-600/25 transition-colors"
+              className="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-sky-600/25 transition-colors cursor-pointer"
             >
-              <Send className="h-4 w-4" /> Broadcast Packet
+              <Send className="h-4 w-4" /> Broadcast
             </button>
           </div>
         </div>
 
         {statusMsg && (
-          <div className="mt-4 p-3 rounded-xl bg-sky-50 border border-sky-200 dark:bg-sky-500/10 dark:border-sky-500/30 text-xs text-sky-800 dark:text-sky-300 font-mono flex items-center gap-2 font-bold shadow-sm">
+          <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 rounded-xl bg-sky-50 border border-sky-200 dark:bg-sky-500/10 dark:border-sky-500/30 text-[11px] sm:text-xs text-sky-800 dark:text-sky-300 font-mono flex items-center gap-2 font-bold shadow-2xs">
             <CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400 flex-shrink-0" />
             <span>{statusMsg}</span>
           </div>
@@ -200,43 +200,42 @@ export default function ESP32Simulator({ zones, onTelemetrySent, isDarkMode }) {
       </div>
 
       {/* Live Wireless Telemetry Packet Log Feed */}
-      <div className="glass-panel p-6 rounded-2xl space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+      <div className="glass-panel p-3.5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3 sm:space-y-4 bg-white dark:bg-slate-900 border border-[#d1ded5] dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Radio className="h-4 w-4 text-emerald-600 dark:text-emerald-400 animate-pulse" /> Live Telemetry Ingestion Activity Stream
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Incoming sensor packets logged from connected ESP32 hardware</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">Incoming sensor packets logged from connected ESP32 hardware</p>
           </div>
-          <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-slate-800 dark:text-emerald-400 dark:border-slate-700 font-bold">
+          <span className="text-[10px] sm:text-[11px] font-mono px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-slate-800 dark:text-emerald-400 dark:border-slate-700 font-bold self-start sm:self-auto">
             HTTP/REST Ingest: ACTIVE
           </span>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 shadow-sm">
-          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto no-scrollbar rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 shadow-xs">
+          <table className="w-full min-w-[550px] text-left text-xs text-slate-700 dark:text-slate-300">
             <thead className="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="py-3 px-4">Timestamp</th>
-                <th className="py-3 px-4">Target Storage Zone</th>
-                <th className="py-3 px-4">Sensory Telemetry Payload</th>
-                <th className="py-3 px-4 text-right">HTTP Status</th>
+                <th className="py-2.5 sm:py-3 px-3 sm:px-4">Timestamp</th>
+                <th className="py-2.5 sm:py-3 px-3 sm:px-4">Target Node</th>
+                <th className="py-2.5 sm:py-3 px-3 sm:px-4">Sensory Telemetry Payload</th>
+                <th className="py-2.5 sm:py-3 px-3 sm:px-4 text-right">HTTP Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-mono text-xs">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-mono text-[11px] sm:text-xs">
               {packetLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                  <td className="py-3 px-4 text-slate-500 dark:text-slate-400">{log.time}</td>
-                  <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">{log.zone}</td>
-                  <td className="py-3 px-4 text-slate-700 dark:text-slate-300">{log.payload}</td>
-                  <td className="py-3 px-4 text-right text-emerald-600 dark:text-emerald-400 font-black">{log.status}</td>
+                  <td className="py-2.5 sm:py-3 px-3 sm:px-4 text-slate-500 dark:text-slate-400">{log.time}</td>
+                  <td className="py-2.5 sm:py-3 px-3 sm:px-4 font-bold text-slate-900 dark:text-white">{log.zone}</td>
+                  <td className="py-2.5 sm:py-3 px-3 sm:px-4 text-slate-700 dark:text-slate-300">{log.payload}</td>
+                  <td className="py-2.5 sm:py-3 px-3 sm:px-4 text-right text-emerald-600 dark:text-emerald-400 font-black">{log.status}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
-
     </div>
   );
 }

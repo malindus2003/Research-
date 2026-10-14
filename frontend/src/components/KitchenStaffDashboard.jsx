@@ -1,7 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { Users, Clock, Flame, Award, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2, TrendingUp, Utensils, X, Lock, LogIn, Key, Smartphone, Coffee, ChefHat, Send, CheckSquare, Pizza, Plus, Minus, Hash, Search } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Users, Clock, Flame, Award, AlertTriangle, ArrowRight, ShieldCheck, CheckCircle2, TrendingUp, Utensils, X, Lock, LogIn, Key, Smartphone, Coffee, ChefHat, Send, CheckSquare, Pizza, Plus, Minus, Hash, Search, ChevronDown, ChevronLeft, ChevronRight, LayoutDashboard, Check } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ReferenceArea } from 'recharts';
 import axios from 'axios';
+
+// 5 Kitchen Operational Subparts for Dropdown Navigation
+const KITCHEN_PARTS = [
+  {
+    id: 'stations',
+    title: 'Kitchen Station Workload & Queue Status',
+    shortTitle: 'Station Monitors',
+    description: 'Real-time queue load, active cooks, bottlenecks & capacity alerts across all 5 stations',
+    icon: Utensils,
+    badge: '5 Stations',
+    badgeColor: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+  },
+  {
+    id: 'routing',
+    title: 'Real-Time Order Routing & Task Dispatch',
+    shortTitle: 'Order Routing',
+    description: 'Active order queue split across cooking, grill & beverage lines with waiter simulator',
+    icon: Send,
+    badge: 'Live Routing',
+    badgeColor: 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300 border-blue-300 dark:border-blue-700'
+  },
+  {
+    id: 'directives',
+    title: 'AI Staff Allocation & Directives',
+    shortTitle: 'AI Directives',
+    description: 'Real-time dynamic queue directives, shift efficiency floor & surge simulation',
+    icon: Flame,
+    badge: 'AI Engine',
+    badgeColor: 'bg-orange-100 text-orange-900 dark:bg-orange-950 dark:text-orange-300 border-orange-300 dark:border-orange-700'
+  },
+  {
+    id: 'rush',
+    title: 'Peak-Hour Workload & Staffing Forecast',
+    shortTitle: 'Peak-Hour Rush',
+    description: 'Hourly staffing curves (07:00-22:30) with breakfast, lunch, dinner & seasonal rush overlays',
+    icon: TrendingUp,
+    badge: 'Demand Curve',
+    badgeColor: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+  },
+  {
+    id: 'staff',
+    title: 'Staff Skill-Gap Analysis & Progression',
+    shortTitle: 'Staff Skills',
+    description: 'Staff skill matrices, cross-station training paths & staff self-assessment portal',
+    icon: Users,
+    badge: 'Line Staff',
+    badgeColor: 'bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-300 border-purple-300 dark:border-purple-700'
+  },
+  {
+    id: 'all',
+    title: 'Full Kitchen System (All Sections)',
+    shortTitle: 'All Sections',
+    description: 'Complete view across stations, live routing, rush charts, staff skills & directives',
+    icon: LayoutDashboard,
+    badge: 'All Views',
+    badgeColor: 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700'
+  }
+];
 
 export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin' }) {
   const [data, setData] = useState(null);
@@ -17,6 +75,31 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
   const [shiftEfficiency, setShiftEfficiency] = useState("88.5%");
   const [shiftPrepTime, setShiftPrepTime] = useState("7.4 mins");
   const [last4HourUpdate, setLast4HourUpdate] = useState("Shift Sync Active (Auto-updates every 4 Hours)");
+
+  // Kitchen Subpart Navigation State ('stations', 'routing', 'directives', 'rush', 'staff', 'all')
+  const [activeKitchenPart, setActiveKitchenPart] = useState('stations');
+  const [kitchenDropdownOpen, setKitchenDropdownOpen] = useState(false);
+  const kitchenDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (kitchenDropdownRef.current && !kitchenDropdownRef.current.contains(e.target)) {
+        setKitchenDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const currentKitchenIndex = KITCHEN_PARTS.findIndex(p => p.id === activeKitchenPart);
+  const handlePrevKitchenPart = () => {
+    const prevIdx = (currentKitchenIndex - 1 + KITCHEN_PARTS.length) % KITCHEN_PARTS.length;
+    setActiveKitchenPart(KITCHEN_PARTS[prevIdx].id);
+  };
+  const handleNextKitchenPart = () => {
+    const nextIdx = (currentKitchenIndex + 1) % KITCHEN_PARTS.length;
+    setActiveKitchenPart(KITCHEN_PARTS[nextIdx].id);
+  };
 
   // 4-Hour Shift Cycle Metric Auto-Update Engine
   useEffect(() => {
@@ -593,34 +676,34 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
       <div className="glass-panel p-6 rounded-2xl space-y-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Kitchen Efficiency & Dynamic Staff Optimization</h2>
-                <span className="text-xs px-2.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 font-bold">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Kitchen Efficiency & Staff Optimization</h2>
+                <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 font-bold">
                   Workflow & Queue AI
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
                 Real-time station queue monitoring, peak-hour staff allocation, and staff progression
               </p>
             </div>
 
-            <div className="flex flex-col items-end gap-1.5">
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Kitchen Overall Efficiency</span>
-                  <div className={`text-xl font-black ${isCriticalEfficiency ? 'text-rose-600 dark:text-rose-400 animate-pulse' : 'text-emerald-600 dark:text-emerald-400'}`}>
+            <div className="flex flex-col sm:items-end gap-1.5 w-full sm:w-auto">
+              <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+                <div className="text-left sm:text-right">
+                  <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Efficiency</span>
+                  <div className={`text-lg sm:text-xl font-black ${isCriticalEfficiency ? 'text-rose-600 dark:text-rose-400 animate-pulse' : 'text-emerald-600 dark:text-emerald-400'}`}>
                     {shiftEfficiency}
                   </div>
                 </div>
                 <div className="text-right border-l border-slate-200 dark:border-slate-800 pl-4">
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Avg Prep Time</span>
-                  <div className="text-xl font-black text-slate-900 dark:text-white">{shiftPrepTime}</div>
+                  <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase">Avg Prep Time</span>
+                  <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">{shiftPrepTime}</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 sm:px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
                 <Clock className="h-3 w-3 text-orange-500" />
-                <span>⏰ Auto-updates every 4 hours • {last4HourUpdate}</span>
+                <span>⏰ {last4HourUpdate}</span>
               </div>
             </div>
           </div>
@@ -636,32 +719,206 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             </div>
           )}
 
-          {/* AI Actionable Directives (Real-Time Dynamic Queue) */}
-          <div className="p-5 rounded-2xl bg-orange-50 border border-orange-200 dark:bg-orange-950/40 dark:border-orange-500/30 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-orange-200 dark:border-orange-800/60 pb-3">
+          {/* Kitchen Subpart Dropdown & Quick Navigation Toolbar */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+            
+            {/* Dropdown Selector */}
+            <div className="relative w-full lg:w-96" ref={kitchenDropdownRef}>
+              <div className="flex items-center justify-between gap-2 mb-1 lg:hidden">
+                <span className="text-[10px] uppercase font-black text-slate-500 dark:text-slate-400">
+                  Select Kitchen Subpart:
+                </span>
+                <span className="text-[10px] font-bold text-orange-600 dark:text-orange-400">
+                  {KITCHEN_PARTS.length} Available
+                </span>
+              </div>
+
+              {(() => {
+                const currentPart = KITCHEN_PARTS.find(p => p.id === activeKitchenPart) || KITCHEN_PARTS[0];
+                const PartIcon = currentPart.icon;
+                return (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setKitchenDropdownOpen(!kitchenDropdownOpen)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-850 hover:border-orange-500 dark:hover:border-orange-500 flex items-center justify-between gap-2.5 shadow-2xs transition-all text-left group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300 border border-orange-300 dark:border-orange-700 flex-shrink-0 group-hover:scale-105 transition-transform">
+                          <PartIcon className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[9px] uppercase font-black text-slate-400 leading-tight">
+                            Active Kitchen View
+                          </div>
+                          <div className="text-xs font-black text-slate-900 dark:text-white truncate">
+                            {currentPart.title}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <span className={`hidden sm:inline-block text-[9px] font-black px-2 py-0.5 rounded-full border ${currentPart.badgeColor}`}>
+                          {currentPart.badge}
+                        </span>
+                        <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform duration-200 ${kitchenDropdownOpen ? 'rotate-180 text-orange-600' : ''}`} />
+                      </div>
+                    </button>
+
+                    {/* Dropdown Options Popup */}
+                    {kitchenDropdownOpen && (
+                      <div className="absolute right-0 left-0 lg:left-0 lg:right-auto mt-2 w-full lg:w-96 rounded-2xl bg-white/98 dark:bg-slate-900/98 backdrop-blur-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-50 space-y-1 animate-fade-in">
+                        <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                          <span className="text-[10px] uppercase font-black tracking-wider text-slate-400">
+                            Kitchen System Parts
+                          </span>
+                          <span className="text-[10px] font-bold text-orange-600 dark:text-orange-400">
+                            Tap to focus view
+                          </span>
+                        </div>
+
+                        {KITCHEN_PARTS.map((part) => {
+                          const IconComp = part.icon;
+                          const isSelected = part.id === activeKitchenPart;
+                          return (
+                            <button
+                              key={part.id}
+                              type="button"
+                              onClick={() => {
+                                setActiveKitchenPart(part.id);
+                                setKitchenDropdownOpen(false);
+                              }}
+                              className={`w-full p-2.5 rounded-xl text-left transition-all flex items-start gap-3 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-orange-50 dark:bg-orange-950/60 border border-orange-300 dark:border-orange-700/60 shadow-2xs'
+                                  : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-transparent'
+                              }`}
+                            >
+                              <div className={`p-2 rounded-xl flex-shrink-0 mt-0.5 border ${
+                                isSelected
+                                  ? 'bg-orange-600 text-white border-orange-600'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                              }`}>
+                                <IconComp className="h-4 w-4" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className={`text-xs font-black truncate ${isSelected ? 'text-orange-950 dark:text-orange-200' : 'text-slate-900 dark:text-white'}`}>
+                                    {part.title}
+                                  </span>
+                                  {isSelected ? (
+                                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-orange-600 text-white flex-shrink-0 flex items-center gap-1">
+                                      <Check className="h-3 w-3" /> Active
+                                    </span>
+                                  ) : (
+                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border flex-shrink-0 ${part.badgeColor}`}>
+                                      {part.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 leading-tight">
+                                  {part.description}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Quick Pill Tabs + Previous/Next Stepper */}
+            <div className="flex items-center justify-between sm:justify-end gap-2 w-full lg:w-auto">
+              {/* Stepper Buttons */}
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-0.5 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={handlePrevKitchenPart}
+                  title="Previous Kitchen Section"
+                  className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="text-[10px] font-mono font-bold px-2 text-slate-600 dark:text-slate-400 select-none">
+                  {currentKitchenIndex + 1}/{KITCHEN_PARTS.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleNextKitchenPart}
+                  title="Next Kitchen Section"
+                  className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Quick Filter Pills */}
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
+                {KITCHEN_PARTS.map((kp) => (
+                  <button
+                    key={kp.id}
+                    type="button"
+                    onClick={() => setActiveKitchenPart(kp.id)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap border cursor-pointer ${
+                      activeKitchenPart === kp.id
+                        ? 'bg-orange-600 text-white border-orange-600 shadow-2xs'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-orange-50 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {kp.shortTitle}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* AI Actionable Directives (Real-Time Dynamic Queue) */}
+        {(activeKitchenPart === 'all' || activeKitchenPart === 'directives') && (
+          <div className="glass-panel p-6 rounded-2xl space-y-4 animate-fade-in">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Flame className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                <div className="p-2 rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20">
+                  <Flame className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">AI Staff Allocation Directives</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Real-time dynamic queue directives and surge simulation</p>
+                </div>
+              </div>
+              <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
+                AI Directives Engine
+              </span>
+            </div>
+
+            <div className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-orange-50 border border-orange-200 dark:bg-orange-950/40 dark:border-orange-500/30 shadow-sm space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-orange-200 dark:border-orange-800/60 pb-3">
+              <div className="flex items-center gap-2">
+                <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
                 <div>
                   <h3 className="text-xs font-black text-orange-900 dark:text-orange-200 uppercase tracking-wider">
-                    AI Dynamic Staff Allocation Directives
+                    AI Staff Allocation Directives
                   </h3>
-                  <p className="text-[11px] text-orange-800 dark:text-orange-300 font-medium">
-                    Updates dynamically based on real-time order queue surges and staff skill matching
+                  <p className="text-[10px] sm:text-[11px] text-orange-800 dark:text-orange-300 font-medium">
+                    Updates dynamically based on real-time order queue surges
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span> Live Kitchen Engine
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live Engine
                 </span>
                 <button
                   onClick={handleSimulateSurge}
-                  className="px-3 py-1 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                  className="px-2.5 sm:px-3 py-1 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-[11px] sm:text-xs shadow-xs transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap"
                   title="Simulate sudden order queue spike"
                 >
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  <span>Simulate Order Queue Surge</span>
+                  <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  <span>Simulate Surge</span>
                 </button>
               </div>
             </div>
@@ -757,9 +1014,11 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             )}
           </div>
         </div>
+      )}
 
       {/* Real-Time Mobile Order Dispatch & Station Task Routing Section */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-5">
+      {(activeKitchenPart === 'all' || activeKitchenPart === 'routing') && (
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md space-y-5 animate-fade-in">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
             <div>
               <div className="flex items-center gap-2">
@@ -794,7 +1053,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                 className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs"
               >
                 {/* Header info */}
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-black text-slate-900 dark:text-white">
                       Order #{ord.orderNo}
@@ -804,24 +1063,24 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${ord.priority.includes("Rush") || ord.priority.includes("VIP")
                         ? "bg-rose-600 text-white animate-pulse"
                         : "bg-emerald-600 text-white"
                       }`}>
-                      🔴 Priority: {ord.priority}
+                      Priority: {ord.priority}
                     </span>
-                    <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                    <span className="text-[11px] sm:text-xs font-extrabold text-slate-600 dark:text-slate-300 flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5 text-slate-400" />
-                      Received: {ord.timestamp}
+                      {ord.timestamp}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleCompleteEntireOrder(ord.id, ord.orderNo)}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] cursor-pointer shadow-xs transition-all flex items-center gap-1 ml-auto"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] sm:text-xs cursor-pointer shadow-xs transition-all flex items-center gap-1 sm:ml-auto"
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
-                      <span>Mark Prepared & Disappear</span>
+                      <span>Mark Prepared</span>
                     </button>
                   </div>
                 </div>
@@ -961,9 +1220,11 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             ))}
           </div>
         </div>
+      )}
 
       {/* Peak-Hour Workload & Staffing Demand Chart */}
-      <div className="glass-panel p-6 rounded-2xl space-y-4">
+      {(activeKitchenPart === 'all' || activeKitchenPart === 'rush') && (
+        <div className="glass-panel p-6 rounded-2xl space-y-4 animate-fade-in">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Peak-Hour Workload & Staffing Forecast (07:00 - 22:30)</h3>
@@ -1192,10 +1453,12 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             </ResponsiveContainer>
           </div>
         </div>
+      )}
 
       {/* Kitchen Station Workload & Queue Monitors */}
-      <div className="glass-panel p-6 rounded-2xl space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+      {(activeKitchenPart === 'all' || activeKitchenPart === 'stations') && (
+        <div className="glass-panel p-6 rounded-2xl space-y-4 animate-fade-in">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Real-Time Kitchen Station Workload & Queue Status</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Monitoring queue latency and load balancing across all 4 production stations</p>
@@ -1366,9 +1629,11 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
           })}
         </div>
       </div>
+    )}
 
       {/* Staff Skill Matrix & Progression Paths */}
-      <div className="glass-panel p-6 rounded-2xl space-y-4">
+      {(activeKitchenPart === 'all' || activeKitchenPart === 'staff') && (
+        <div className="glass-panel p-6 rounded-2xl space-y-4 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Staff Skill-Gap Analysis & Progression Paths</h3>
@@ -1517,6 +1782,7 @@ export default function KitchenStaffDashboard({ isDarkMode, currentRole = 'admin
             })}
           </div>
         </div>
+      )}
 
       {/* Mobile Waiter Order Entry Simulation Modal with Sri Lankan & Pizza Menu */}
       {showOrderSimulatorModal && (
